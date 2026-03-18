@@ -33,7 +33,7 @@ exports.register = async (req, res) => {
         recipientEmail: email,
         recipientName: name,
         variables: {
-          verificationLink: `${process.env.CLIENT_URL}/verify-email?code=${verificationCode}&email=${email}`
+          verificationLink: `${process.env.CLIENT_URL}/api/auth/verify-email?code=${verificationCode}&email=${email}`
         }
       });
     } catch (err) {
@@ -102,6 +102,18 @@ exports.verifyEmail = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Check if it's the admin logging in
+    const adminUsername = process.env.ADMIN_USERNAME;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (adminUsername && adminPassword && email === adminUsername && password === adminPassword) {
+      req.session.userId = 'admin';
+      req.session.role = 'admin';
+      req.session.adminName = 'Admin';
+      return res.status(200).json({ message: 'Admin logged in successfully', redirectUrl: '/admin' });
+    }
+
     const user = await User.findOne({ email });
 
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
@@ -112,7 +124,7 @@ exports.login = async (req, res) => {
     req.session.userId = user._id;
     req.session.role = user.role;
 
-    res.status(200).json({ message: 'Logged in successfully' });
+    res.status(200).json({ message: 'Logged in successfully', redirectUrl: '/shop' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

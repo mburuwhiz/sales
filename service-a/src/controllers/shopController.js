@@ -18,15 +18,24 @@ exports.checkout = async (req, res) => {
     let totalAmount = 0;
 
     for (let item of items) {
+      const quantity = parseInt(item.quantity, 10);
+      if (isNaN(quantity) || quantity <= 0) {
+        return res.status(400).json({ message: 'Invalid item quantity' });
+      }
       const product = await Product.findById(item.productId);
-      if (product) totalAmount += product.price * item.quantity;
+      if (product) totalAmount += product.price * quantity;
     }
 
     // Logic for coins deduction based on threshold
     const coinThreshold = process.env.COIN_REDEMPTION_THRESHOLD || 100;
     if (useCoins && req.user.walletCoins >= coinThreshold) {
-      totalAmount -= req.user.walletCoins;
-      req.user.walletCoins = 0;
+      if (req.user.walletCoins >= totalAmount) {
+        req.user.walletCoins -= totalAmount;
+        totalAmount = 0;
+      } else {
+        totalAmount -= req.user.walletCoins;
+        req.user.walletCoins = 0;
+      }
     }
 
     // Logic for awarding coins if purchase exceeds minimum

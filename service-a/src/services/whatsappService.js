@@ -6,13 +6,6 @@ const AuthState = require('../models/AuthState');
 let sock = null;
 
 async function connectToWhatsApp() {
-  // Utilizing a basic Mongo adapter pattern inline for baileys
-  const { state, saveCreds } = await useMultiFileAuthState('baileys_auth_info');
-  // NOTE: Given the complexity of implementing a full robust MongoDB Baileys AuthState in a single shot without a dedicated library,
-  // We will intercept the multiFileAuthState to satisfy the "MongoDB whatsapp_sessions collection" mandate by syncing it,
-  // or use a simplified pseudo-mongo auth state. We will use a dedicated mongoAuth implementation if possible.
-
-  // Update: We'll use the custom useMongoDBAuthState implemented in mongoAuthState.js
   const { useMongoDBAuthState } = require('./mongoAuthState');
   const auth = await useMongoDBAuthState();
 

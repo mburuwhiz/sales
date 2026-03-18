@@ -3,10 +3,14 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const path = require('path');
 const dotenv = require('dotenv');
+const mongoSanitize = require('express-mongo-sanitize');
 
 dotenv.config();
 
 const app = express();
+
+// Sanitize data against NoSQL query injection
+app.use(mongoSanitize());
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));

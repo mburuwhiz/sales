@@ -18,7 +18,7 @@
 
   <div class="grid">
     <% products.forEach(product => { %>
-      <div class="glass-panel product-card" onclick='openProductModal(<%- JSON.stringify(product) %>)'>
+      <div class="glass-panel product-card" data-product="<%= encodeURIComponent(JSON.stringify(product)) %>" onclick="openProductModal(this)">
         <img src="<%= product.images[0] || '/logo.png' %>" alt="<%= product.name %>">
         <h3 style="margin: 10px 0;"><%= product.name %></h3>
         <p>KSH <%= product.price %></p>
@@ -52,12 +52,16 @@
 
     let selectedProduct = null;
 
-    function openProductModal(product) {
+    function openProductModal(element) {
+      const productData = element.getAttribute('data-product');
+      if (!productData) return;
+      const product = JSON.parse(decodeURIComponent(productData));
+
       selectedProduct = product;
       document.getElementById('modal-img').src = product.images[0] || '/logo.png';
       document.getElementById('modal-title').textContent = product.name;
       document.getElementById('modal-price').textContent = `KSH ${product.price}`;
-      document.getElementById('modal-desc').textContent = product.description;
+      document.getElementById('modal-desc').textContent = product.description || '';
       document.getElementById('product-modal').classList.add('active');
     }
 

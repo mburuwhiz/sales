@@ -2,13 +2,26 @@ const isUser = async (req, res, next) => {
   if (!req.session.userId) {
     return res.redirect('/login');
   }
-  const User = require('../models/User');
-  const user = await User.findById(req.session.userId);
-  if (!user.isEmailVerified || !user.isPhoneVerified) {
-     return res.status(403).send('Please verify email and phone before proceeding.');
+  if (req.session.userId === 'admin') {
+    return res.redirect('/admin');
   }
-  req.user = user;
-  next();
+  const User = require('../models/User');
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      req.session.destroy();
+      return res.redirect('/login');
+    }
+    if (!user.isEmailVerified || !user.isPhoneVerified) {
+       return res.status(403).send('Please verify email and phone before proceeding.');
+    }
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error('Error finding user in session:', error);
+    req.session.destroy();
+    return res.redirect('/login');
+  }
 };
 
 const isAdmin = async (req, res, next) => {
