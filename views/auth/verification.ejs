@@ -1,0 +1,90 @@
+<div class="section">
+  <div class="container">
+    <div style="max-width: 500px; margin: 0 auto;">
+      <div class="glass" style="padding: 40px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <i class="fas fa-shield-alt" style="font-size: 60px; color: var(--sage-green); margin-bottom: 15px;"></i>
+          <h2>Verify Your Account</h2>
+          <p style="color: rgba(245, 240, 232, 0.7);">Complete verification to access all features</p>
+        </div>
+
+        <% if (message) { %>
+          <div class="toast <%= message.type %>" style="margin-bottom: 20px; animation: none;">
+            <i class="fas fa-<%= message.type === 'success' ? 'check-circle' : 'exclamation-circle' %>"></i> 
+            <%= message.text %>
+          </div>
+        <% } %>
+
+        <!-- Email Verification -->
+        <div style="margin-bottom: 30px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+          <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+            <div style="width: 50px; height: 50px; border-radius: 50%; background: <%= emailVerified ? 'rgba(45, 90, 39, 0.3)' : 'rgba(180, 140, 50, 0.3)' %>; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-envelope" style="color: <%= emailVerified ? '#7dd87d' : '#e8c547' %>; font-size: 20px;"></i>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 5px;">Email Verification</h4>
+              <p style="font-size: 13px; color: rgba(245, 240, 232, 0.6);">
+                <%= emailVerified ? 'Verified' : 'Pending - Check your email' %>
+              </p>
+            </div>
+            <% if (emailVerified) { %>
+              <i class="fas fa-check-circle" style="color: #7dd87d; font-size: 24px; margin-left: auto;"></i>
+            <% } %>
+          </div>
+          
+          <% if (!emailVerified) { %>
+            <p style="font-size: 13px; color: rgba(245, 240, 232, 0.7); margin-bottom: 10px;">
+              We've sent a verification link to <strong><%= user.email %></strong>. Please check your inbox and click the link to verify.
+            </p>
+          <% } %>
+        </div>
+
+        <!-- Phone Verification -->
+        <div style="margin-bottom: 30px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+          <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+            <div style="width: 50px; height: 50px; border-radius: 50%; background: <%= phoneVerified ? 'rgba(45, 90, 39, 0.3)' : 'rgba(180, 140, 50, 0.3)' %>; display: flex; align-items: center; justify-content: center;">
+              <i class="fab fa-whatsapp" style="color: <%= phoneVerified ? '#7dd87d' : '#e8c547' %>; font-size: 20px;"></i>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 5px;">Phone Verification</h4>
+              <p style="font-size: 13px; color: rgba(245, 240, 232, 0.6);">
+                <%= phoneVerified ? 'Verified' : 'Pending - Enter code from WhatsApp' %>
+              </p>
+            </div>
+            <% if (phoneVerified) { %>
+              <i class="fas fa-check-circle" style="color: #7dd87d; font-size: 24px; margin-left: auto;"></i>
+            <% } %>
+          </div>
+          
+          <% if (!phoneVerified) { %>
+            <form action="/auth/verify-phone" method="POST">
+              <div style="display: flex; gap: 10px;">
+                <input type="text" name="code" class="form-input" placeholder="Enter 6-digit code" maxlength="6" pattern="\d{6}" required style="flex: 1; text-align: center; letter-spacing: 5px; font-size: 18px;">
+                <button type="submit" class="btn btn-primary">Verify</button>
+              </div>
+            </form>
+            <form action="/auth/resend-phone-code" method="POST" style="margin-top: 10px;">
+              <button type="submit" class="btn btn-secondary btn-sm" style="width: 100%;">
+                <i class="fas fa-redo"></i> Resend Code
+              </button>
+            </form>
+          <% } %>
+        </div>
+
+        <!-- Continue Button -->
+        <% if (emailVerified && phoneVerified) { %>
+          <a href="/shop" class="btn btn-primary" style="width: 100%;">
+            <i class="fas fa-shopping-basket"></i> Start Shopping
+          </a>
+        <% } else { %>
+          <div style="text-align: center; padding: 20px; background: rgba(180, 140, 50, 0.1); border-radius: 12px;">
+            <p style="color: #e8c547;">
+              <i class="fas fa-info-circle"></i> 
+              Please complete both verifications to proceed to checkout.
+            </p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>

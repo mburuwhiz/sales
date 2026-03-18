@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <style>
+    .admin-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid var(--glass-border);
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .admin-sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .admin-sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cream);
+      text-decoration: none;
+    }
+
+    .admin-nav {
+      list-style: none;
+      padding: 15px 0;
+    }
+
+    .admin-nav li a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: rgba(245, 240, 232, 0.8);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .admin-nav li a:hover,
+    .admin-nav li a.active {
+      background: rgba(122, 158, 126, 0.2);
+      color: var(--cream);
+    }
+
+    .admin-main {
+      margin-left: 260px;
+      padding: 30px;
+      min-height: 100vh;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .admin-table th {
+      font-weight: 600;
+      color: rgba(245, 240, 232, 0.8);
+    }
+
+    @media (max-width: 768px) {
+      .admin-sidebar { transform: translateX(-100%); }
+      .admin-sidebar.active { transform: translateX(0); }
+      .admin-main { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-header">
+      <a href="/admin" class="admin-sidebar-logo">
+        <img src="/logo.png" alt="Fresh Harvest">
+        <span style="font-weight: 700;">ADMIN</span>
+      </a>
+    </div>
+    <ul class="admin-nav">
+      <li><a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="/admin/products"><i class="fas fa-box"></i> Products</a></li>
+      <li><a href="/admin/orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+      <li><a href="/admin/emails"><i class="fas fa-envelope"></i> Email Broadcast</a></li>
+      <li><a href="/admin/help-requests" class="active"><i class="fas fa-question-circle"></i> Help Requests</a></li>
+      <li><a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a></li>
+      <li><a href="/admin/settings/whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+      <li style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+        <a href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+      <div>
+        <h2>Help Requests</h2>
+        <p style="color: rgba(245, 240, 232, 0.6);">Customer support requests</p>
+      </div>
+      <div>
+        <form action="/admin/help-requests" method="GET" style="display: inline;">
+          <select name="status" class="form-input" style="width: auto;" onchange="this.form.submit()">
+            <option value="">All Requests</option>
+            <option value="Open" <%= selectedStatus === 'Open' ? 'selected' : '' %>>Open</option>
+            <option value="Closed" <%= selectedStatus === 'Closed' ? 'selected' : '' %>>Closed</option>
+          </select>
+        </form>
+      </div>
+    </div>
+
+    <!-- Requests Table -->
+    <div class="glass" style="padding: 25px;">
+      <% if (requests.length > 0) { %>
+        <div style="overflow-x: auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% requests.forEach(request => { %>
+                <tr>
+                  <td><%= new Date(request.createdAt).toLocaleDateString() %></td>
+                  <td>
+                    <div><%= request.userId?.name || 'Unknown' %></div>
+                    <div style="font-size: 12px; color: rgba(245, 240, 232, 0.6);"><%= request.userId?.email %></div>
+                  </td>
+                  <td><%= request.subject %></td>
+                  <td>
+                    <span class="badge badge-<%= request.status === 'Open' ? 'warning' : 'success' %>">
+                      <%= request.status %>
+                    </span>
+                  </td>
+                  <td>
+                    <div style="display: flex; gap: 8px;">
+                      <button onclick="viewRequest('<%= request._id %>', '<%= request.subject %>', '<%= request.message %>', '<%= request.userId?.name %>', '<%= request.userId?.email %>', '<%= request.userId?.phone %>')" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye"></i> View
+                      </button>
+                      <% if (request.status === 'Open') { %>
+                        <form action="/admin/help-requests/<%= request._id %>/close" method="POST" style="display: inline;">
+                          <button type="submit" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-check"></i> Close
+                          </button>
+                        </form>
+                      <% } %>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div style="text-align: center; padding: 40px;">
+          <i class="fas fa-inbox" style="font-size: 50px; color: var(--sage-green); opacity: 0.5; margin-bottom: 15px;"></i>
+          <p style="color: rgba(245, 240, 232, 0.7);">No help requests found.</p>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <!-- View Request Modal -->
+  <div class="modal-overlay" id="requestModal">
+    <div class="modal-content glass" style="max-width: 600px; width: 90%; padding: 30px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 id="modalSubject"></h3>
+        <button onclick="closeModal()" style="background: none; border: none; color: var(--cream); font-size: 24px; cursor: pointer;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div style="margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+        <div style="font-size: 12px; color: rgba(245, 240, 232, 0.5); margin-bottom: 5px;">From</div>
+        <div id="modalCustomer"></div>
+        <div id="modalEmail" style="font-size: 13px; color: rgba(245, 240, 232, 0.7);"></div>
+        <div id="modalPhone" style="font-size: 13px; color: rgba(245, 240, 232, 0.7);"></div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 12px; color: rgba(245, 240, 232, 0.5); margin-bottom: 5px;">Message</div>
+        <div id="modalMessage" style="padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; line-height: 1.8;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function viewRequest(id, subject, message, name, email, phone) {
+      document.getElementById('modalSubject').textContent = subject;
+      document.getElementById('modalCustomer').textContent = name || 'Unknown';
+      document.getElementById('modalEmail').textContent = email || '';
+      document.getElementById('modalPhone').textContent = phone || '';
+      document.getElementById('modalMessage').textContent = message;
+      
+      document.getElementById('requestModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('requestModal').classList.remove('active');
+    }
+
+    document.getElementById('requestModal').addEventListener('click', (e) => {
+      if (e.target.id === 'requestModal') {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>

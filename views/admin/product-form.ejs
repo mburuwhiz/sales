@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <style>
+    .admin-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid var(--glass-border);
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .admin-sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .admin-sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cream);
+      text-decoration: none;
+    }
+
+    .admin-nav {
+      list-style: none;
+      padding: 15px 0;
+    }
+
+    .admin-nav li a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: rgba(245, 240, 232, 0.8);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .admin-nav li a:hover,
+    .admin-nav li a.active {
+      background: rgba(122, 158, 126, 0.2);
+      color: var(--cream);
+    }
+
+    .admin-main {
+      margin-left: 260px;
+      padding: 30px;
+      min-height: 100vh;
+    }
+
+    .image-upload-area {
+      border: 2px dashed var(--glass-border);
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .image-upload-area:hover {
+      border-color: var(--sage-green);
+      background: rgba(122, 158, 126, 0.1);
+    }
+
+    .cropper-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .cropper-modal.active {
+      display: flex;
+    }
+
+    .cropper-container {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    #imagePreview {
+      max-width: 100%;
+      max-height: 400px;
+    }
+
+    @media (max-width: 768px) {
+      .admin-sidebar { transform: translateX(-100%); }
+      .admin-sidebar.active { transform: translateX(0); }
+      .admin-main { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-header">
+      <a href="/admin" class="admin-sidebar-logo">
+        <img src="/logo.png" alt="Fresh Harvest">
+        <span style="font-weight: 700;">ADMIN</span>
+      </a>
+    </div>
+    <ul class="admin-nav">
+      <li><a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="/admin/products" class="active"><i class="fas fa-box"></i> Products</a></li>
+      <li><a href="/admin/orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+      <li><a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a></li>
+      <li style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+        <a href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div style="margin-bottom: 30px;">
+      <a href="/admin/products" class="btn btn-secondary btn-sm">
+        <i class="fas fa-arrow-left"></i> Back to Products
+      </a>
+    </div>
+
+    <div class="glass" style="padding: 30px; max-width: 800px;">
+      <h2 style="margin-bottom: 25px;">
+        <%= product ? 'Edit Product' : 'Add New Product' %>
+      </h2>
+
+      <% if (error) { %>
+        <div class="toast error" style="margin-bottom: 20px; animation: none;">
+          <i class="fas fa-exclamation-circle"></i> <%= error %>
+        </div>
+      <% } %>
+
+      <form action="<%= product ? '/admin/products/edit/' + product._id : '/admin/products/add' %>" method="POST" id="productForm">
+        <!-- Image Upload -->
+        <div class="form-group">
+          <label class="form-label">Product Image</label>
+          <div class="image-upload-area" onclick="document.getElementById('imageInput').click()">
+            <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+            <input type="hidden" name="imageBase64" id="imageBase64">
+            <div id="uploadPlaceholder">
+              <i class="fas fa-cloud-upload-alt" style="font-size: 40px; color: var(--sage-green); margin-bottom: 15px;"></i>
+              <p>Click to upload image</p>
+              <p style="font-size: 12px; color: rgba(245, 240, 232, 0.5);">Recommended: 800x800px</p>
+            </div>
+            <img id="previewImage" style="max-width: 200px; max-height: 200px; border-radius: 8px; display: none;">
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">Product Name</label>
+            <input type="text" name="name" class="form-input" value="<%= product?.name || '' %>" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select name="category" class="form-input" required>
+              <option value="">Select Category</option>
+              <% categories.forEach(cat => { %>
+                <option value="<%= cat %>" <%= product?.category === cat ? 'selected' : '' %>><%= cat %></option>
+              <% }) %>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">Price (KSH)</label>
+            <input type="number" name="price" class="form-input" value="<%= product?.price || '' %>" min="0" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Stock Quantity</label>
+            <input type="number" name="stockQty" class="form-input" value="<%= product?.stockQty || '' %>" min="0" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea name="description" class="form-input" rows="4" required><%= product?.description || '' %></textarea>
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> <%= product ? 'Update Product' : 'Add Product' %>
+          </button>
+          <a href="/admin/products" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Cropper Modal -->
+  <div class="cropper-modal" id="cropperModal">
+    <div class="cropper-container">
+      <div style="background: var(--glass-bg); border-radius: 16px; padding: 20px;">
+        <h3 style="margin-bottom: 20px;">Crop Image</h3>
+        <div style="max-height: 400px; overflow: hidden;">
+          <img id="cropperImage" style="max-width: 100%;">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeCropper()">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveCrop()">
+            <i class="fas fa-crop"></i> Save Crop
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let cropper = null;
+
+    function handleImageSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const cropperModal = document.getElementById('cropperModal');
+        const cropperImage = document.getElementById('cropperImage');
+        
+        cropperImage.src = e.target.result;
+        cropperModal.classList.add('active');
+
+        // Initialize cropper
+        if (cropper) {
+          cropper.destroy();
+        }
+
+        cropper = new Cropper(cropperImage, {
+          aspectRatio: 1 / 1,
+          viewMode: 1,
+          autoCropArea: 0.8,
+          responsive: true
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function closeCropper() {
+      document.getElementById('cropperModal').classList.remove('active');
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+    }
+
+    function saveCrop() {
+      if (!cropper) return;
+
+      const canvas = cropper.getCroppedCanvas({
+        width: 800,
+        height: 800
+      });
+
+      const base64 = canvas.toDataURL('image/jpeg', 0.8);
+      
+      document.getElementById('imageBase64').value = base64;
+      document.getElementById('uploadPlaceholder').style.display = 'none';
+      document.getElementById('previewImage').src = base64;
+      document.getElementById('previewImage').style.display = 'block';
+
+      closeCropper();
+    }
+
+    // Show existing image if editing
+    <% if (product && product.images && product.images.length > 0) { %>
+      document.getElementById('uploadPlaceholder').style.display = 'none';
+      document.getElementById('previewImage').src = '<%= product.images[0] %>';
+      document.getElementById('previewImage').style.display = 'block';
+      document.getElementById('imageBase64').value = '<%= product.images[0] %>';
+    <% } %>
+  </script>
+</body>
+</html>

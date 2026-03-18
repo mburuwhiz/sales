@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <style>
+    .admin-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid var(--glass-border);
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .admin-sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .admin-sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cream);
+      text-decoration: none;
+    }
+
+    .admin-nav {
+      list-style: none;
+      padding: 15px 0;
+    }
+
+    .admin-nav li a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: rgba(245, 240, 232, 0.8);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .admin-nav li a:hover,
+    .admin-nav li a.active {
+      background: rgba(122, 158, 126, 0.2);
+      color: var(--cream);
+    }
+
+    .admin-main {
+      margin-left: 260px;
+      padding: 30px;
+      min-height: 100vh;
+    }
+
+    .editor-container {
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .editor-toolbar {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .editor-toolbar button {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: var(--cream);
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .editor-toolbar button:hover {
+      background: var(--sage-green);
+    }
+
+    .editor-content {
+      min-height: 300px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--cream);
+      outline: none;
+    }
+
+    @media (max-width: 768px) {
+      .admin-sidebar { transform: translateX(-100%); }
+      .admin-sidebar.active { transform: translateX(0); }
+      .admin-main { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-header">
+      <a href="/admin" class="admin-sidebar-logo">
+        <img src="/logo.png" alt="Fresh Harvest">
+        <span style="font-weight: 700;">ADMIN</span>
+      </a>
+    </div>
+    <ul class="admin-nav">
+      <li><a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="/admin/products"><i class="fas fa-box"></i> Products</a></li>
+      <li><a href="/admin/orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+      <li><a href="/admin/emails" class="active"><i class="fas fa-envelope"></i> Email Broadcast</a></li>
+      <li><a href="/admin/help-requests"><i class="fas fa-question-circle"></i> Help Requests</a></li>
+      <li><a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a></li>
+      <li><a href="/admin/settings/whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+      <li style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+        <a href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div style="margin-bottom: 30px;">
+      <h2>Email Broadcast</h2>
+      <p style="color: rgba(245, 240, 232, 0.6);">Send custom emails to your customers</p>
+    </div>
+
+    <% if (message) { %>
+      <div class="toast <%= message.type %>" style="margin-bottom: 20px; animation: none;">
+        <i class="fas fa-<%= message.type === 'success' ? 'check-circle' : 'exclamation-circle' %>"></i> 
+        <%= message.text %>
+      </div>
+    <% } %>
+
+    <div class="glass" style="padding: 30px;">
+      <form action="/admin/emails/broadcast" method="POST" onsubmit="prepareHtmlContent()">
+        <div class="form-group">
+          <label class="form-label">Recipients</label>
+          <select name="recipientType" class="form-input">
+            <option value="all">All Customers (<%= users.length %>)</option>
+            <option value="verified">Verified Customers Only</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <input type="text" name="subject" class="form-input" placeholder="Enter email subject" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Content</label>
+          <div class="editor-container">
+            <div class="editor-toolbar">
+              <button type="button" onclick="formatText('bold')"><i class="fas fa-bold"></i></button>
+              <button type="button" onclick="formatText('italic')"><i class="fas fa-italic"></i></button>
+              <button type="button" onclick="formatText('underline')"><i class="fas fa-underline"></i></button>
+              <button type="button" onclick="formatText('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+              <button type="button" onclick="formatText('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
+              <button type="button" onclick="formatText('justifyLeft')"><i class="fas fa-align-left"></i></button>
+              <button type="button" onclick="formatText('justifyCenter')"><i class="fas fa-align-center"></i></button>
+              <button type="button" onclick="formatText('justifyRight')"><i class="fas fa-align-right"></i></button>
+              <button type="button" onclick="addLink()"><i class="fas fa-link"></i></button>
+            </div>
+            <div class="editor-content" id="emailEditor" contenteditable="true">
+              <h2 style="color: var(--sage-green);">Hello from Fresh Harvest!</h2>
+              <p>Write your message here...</p>
+            </div>
+          </div>
+          <input type="hidden" name="htmlContent" id="htmlContent">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+          <i class="fas fa-paper-plane"></i> Send Broadcast
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    function formatText(command) {
+      document.execCommand(command, false, null);
+      document.getElementById('emailEditor').focus();
+    }
+
+    function addLink() {
+      const url = prompt('Enter URL:');
+      if (url) {
+        document.execCommand('createLink', false, url);
+      }
+    }
+
+    function prepareHtmlContent() {
+      const editorContent = document.getElementById('emailEditor').innerHTML;
+      
+      // Wrap in email template
+      const fullHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+            h2 { color: #2d5a27; }
+            .header { background: #1a3d1c; padding: 20px; text-align: center; }
+            .header img { max-height: 50px; }
+            .content { background: #f5f0e8; padding: 30px; }
+            .footer { background: #1a3d1c; color: #fff; padding: 20px; text-align: center; font-size: 12px; }
+            .btn { display: inline-block; padding: 12px 24px; background: #2d5a27; color: #fff; text-decoration: none; border-radius: 4px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 style="color: #7a9e7e; margin: 0;">FRESH HARVEST</h1>
+          </div>
+          <div class="content">
+            ${editorContent}
+          </div>
+          <div class="footer">
+            <p>Fresh Harvest Grocery - Nairobi, Kenya</p>
+            <p>orders@freshharvest.app | 0113 323 234</p>
+          </div>
+        </body>
+        </html>
+      `;
+      
+      document.getElementById('htmlContent').value = fullHtml;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <style>
+    .admin-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid var(--glass-border);
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .admin-sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .admin-sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cream);
+      text-decoration: none;
+    }
+
+    .admin-nav {
+      list-style: none;
+      padding: 15px 0;
+    }
+
+    .admin-nav li a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: rgba(245, 240, 232, 0.8);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .admin-nav li a:hover,
+    .admin-nav li a.active {
+      background: rgba(122, 158, 126, 0.2);
+      color: var(--cream);
+    }
+
+    .admin-main {
+      margin-left: 260px;
+      padding: 30px;
+      min-height: 100vh;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 30px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--glass-border);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 25px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -24px;
+      top: 0;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--sage-green);
+    }
+
+    @media (max-width: 768px) {
+      .admin-sidebar { transform: translateX(-100%); }
+      .admin-sidebar.active { transform: translateX(0); }
+      .admin-main { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-header">
+      <a href="/admin" class="admin-sidebar-logo">
+        <img src="/logo.png" alt="Fresh Harvest">
+        <span style="font-weight: 700;">ADMIN</span>
+      </a>
+    </div>
+    <ul class="admin-nav">
+      <li><a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="/admin/products"><i class="fas fa-box"></i> Products</a></li>
+      <li><a href="/admin/orders" class="active"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+      <li><a href="/admin/emails"><i class="fas fa-envelope"></i> Email Broadcast</a></li>
+      <li><a href="/admin/help-requests"><i class="fas fa-question-circle"></i> Help Requests</a></li>
+      <li><a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a></li>
+      <li><a href="/admin/settings/whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+      <li style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+        <a href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div style="margin-bottom: 30px;">
+      <a href="/admin/orders" class="btn btn-secondary btn-sm">
+        <i class="fas fa-arrow-left"></i> Back to Orders
+      </a>
+    </div>
+
+    <div class="grid grid-2" style="align-items: start;">
+      <!-- Order Info -->
+      <div>
+        <div class="glass" style="padding: 25px; margin-bottom: 20px;">
+          <h3 style="margin-bottom: 20px;">Order Details</h3>
+          
+          <div style="margin-bottom: 15px;">
+            <div style="font-size: 12px; color: rgba(245, 240, 232, 0.5);">Order Number</div>
+            <div style="font-weight: 600;"><%= order.orderNumber %></div>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <div style="font-size: 12px; color: rgba(245, 240, 232, 0.5);">Customer</div>
+            <div><%= order.userId?.name || 'Unknown' %></div>
+            <div style="font-size: 13px; color: rgba(245, 240, 232, 0.7);"><%= order.userId?.email %></div>
+            <div style="font-size: 13px; color: rgba(245, 240, 232, 0.7);"><%= order.userId?.phone %></div>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <div style="font-size: 12px; color: rgba(245, 240, 232, 0.5);">Delivery Address</div>
+            <div><%= order.deliveryData.building %></div>
+            <div style="color: rgba(245, 240, 232, 0.7);"><%= order.deliveryData.landmark %></div>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <div style="font-size: 12px; color: rgba(245, 240, 232, 0.5);">Receiver Phone</div>
+            <div><%= order.deliveryData.receiverPhone %></div>
+          </div>
+
+          <div>
+            <div style="font-size: 12px; color: rgba(245, 240, 232, 0.5);">Payment</div>
+            <div>M-Pesa: <%= order.mpesaData?.receiptCode || 'Pending' %></div>
+            <div style="font-size: 13px; color: rgba(245, 240, 232, 0.7);">Amount: KSH <%= order.finalAmount?.toLocaleString() %></div>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="glass" style="padding: 25px;">
+          <h3 style="margin-bottom: 20px;">Order Items</h3>
+          
+          <% order.items.forEach(item => { %>
+            <div style="display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid var(--glass-border);">
+              <img src="<%= item.image %>" alt="<%= item.name %>" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+              <div style="flex: 1;">
+                <div style="font-weight: 600;"><%= item.name %></div>
+                <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6);">Qty: <%= item.quantity %> x KSH <%= item.price.toLocaleString() %></div>
+              </div>
+              <div style="font-weight: 600;">KSH <%= (item.price * item.quantity).toLocaleString() %></div>
+            </div>
+          <% }) %>
+
+          <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--glass-border);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Subtotal</span>
+              <span>KSH <%= order.totalAmount?.toLocaleString() %></span>
+            </div>
+            <% if (order.discountAmount > 0) { %>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--sage-green);">
+                <span>Discount</span>
+                <span>-KSH <%= order.discountAmount.toLocaleString() %></span>
+              </div>
+            <% } %>
+            <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700;">
+              <span>Total</span>
+              <span style="color: var(--sage-green);">KSH <%= order.finalAmount?.toLocaleString() %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Update Status -->
+      <div>
+        <div class="glass" style="padding: 25px; margin-bottom: 20px;">
+          <h3 style="margin-bottom: 20px;">Update Status</h3>
+          
+          <form id="statusForm" onsubmit="updateStatus(event)">
+            <div class="form-group">
+              <label class="form-label">Current Status</label>
+              <select name="status" class="form-input" id="statusSelect">
+                <% statuses.forEach(status => { %>
+                  <option value="<%= status %>" <%= order.status === status ? 'selected' : '' %>><%= status %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Note (Optional)</label>
+              <textarea name="note" class="form-input" rows="3" placeholder="e.g., Rider: David, Bike: KMC 123"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+              <i class="fas fa-sync"></i> Update Status
+            </button>
+          </form>
+        </div>
+
+        <!-- Timeline -->
+        <div class="glass" style="padding: 25px;">
+          <h3 style="margin-bottom: 20px;">Tracking Timeline</h3>
+          
+          <div class="timeline">
+            <% order.trackingTimeline.forEach(entry => { %>
+              <div class="timeline-item">
+                <div style="font-weight: 600;"><%= entry.status %></div>
+                <div style="font-size: 12px; color: rgba(245, 240, 232, 0.6);">
+                  <i class="fas fa-clock"></i> <%= new Date(entry.time).toLocaleString() %>
+                </div>
+                <% if (entry.note) { %>
+                  <div style="font-size: 13px; color: rgba(245, 240, 232, 0.8); margin-top: 8px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                    <%= entry.note %>
+                  </div>
+                <% } %>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    async function updateStatus(event) {
+      event.preventDefault();
+      
+      const formData = new FormData(event.target);
+      const data = Object.fromEntries(formData);
+
+      try {
+        const response = await fetch('/admin/orders/<%= order._id %>/update-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showToast('Status updated successfully!', 'success');
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          showToast(result.error || 'Failed to update status', 'error');
+        }
+      } catch (error) {
+        console.error('Update error:', error);
+        showToast('Failed to update status', 'error');
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.querySelector('.toast-container') || (() => {
+        const c = document.createElement('div');
+        c.className = 'toast-container';
+        document.body.appendChild(c);
+        return c;
+      })();
+      
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      const icon = type === 'success' ? 'check-circle' : 
+                   type === 'error' ? 'exclamation-circle' : 'info-circle';
+      
+      toast.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+      container.appendChild(toast);
+
+      setTimeout(() => toast.remove(), 5000);
+    }
+  </script>
+</body>
+</html>

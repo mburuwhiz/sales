@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <style>
+    .admin-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid var(--glass-border);
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .admin-sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .admin-sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cream);
+      text-decoration: none;
+    }
+
+    .admin-nav {
+      list-style: none;
+      padding: 15px 0;
+    }
+
+    .admin-nav li a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: rgba(245, 240, 232, 0.8);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .admin-nav li a:hover,
+    .admin-nav li a.active {
+      background: rgba(122, 158, 126, 0.2);
+      color: var(--cream);
+    }
+
+    .admin-main {
+      margin-left: 260px;
+      padding: 30px;
+      min-height: 100vh;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .admin-table th {
+      font-weight: 600;
+      color: rgba(245, 240, 232, 0.8);
+    }
+
+    @media (max-width: 768px) {
+      .admin-sidebar { transform: translateX(-100%); }
+      .admin-sidebar.active { transform: translateX(0); }
+      .admin-main { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-header">
+      <a href="/admin" class="admin-sidebar-logo">
+        <img src="/logo.png" alt="Fresh Harvest">
+        <span style="font-weight: 700;">ADMIN</span>
+      </a>
+    </div>
+    <ul class="admin-nav">
+      <li><a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="/admin/products"><i class="fas fa-box"></i> Products</a></li>
+      <li><a href="/admin/orders" class="active"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+      <li><a href="/admin/emails"><i class="fas fa-envelope"></i> Email Broadcast</a></li>
+      <li><a href="/admin/help-requests"><i class="fas fa-question-circle"></i> Help Requests</a></li>
+      <li><a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a></li>
+      <li><a href="/admin/settings/whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+      <li style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+        <a href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+      <div>
+        <h2>Orders</h2>
+        <p style="color: rgba(245, 240, 232, 0.6);">Manage customer orders</p>
+      </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="glass" style="padding: 15px; margin-bottom: 20px;">
+      <form action="/admin/orders" method="GET" style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <select name="status" class="form-input" style="width: auto;" onchange="this.form.submit()">
+          <option value="">All Statuses</option>
+          <% statuses.forEach(status => { %>
+            <option value="<%= status %>" <%= selectedStatus === status ? 'selected' : '' %>><%= status %></option>
+          <% }) %>
+        </select>
+        <a href="/admin/orders" class="btn btn-secondary btn-sm">Reset</a>
+      </form>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="glass" style="padding: 25px;">
+      <div style="overflow-x: auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Order #</th>
+              <th>Customer</th>
+              <th>Phone</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% orders.forEach(order => { %>
+              <tr>
+                <td><%= order.orderNumber %></td>
+                <td><%= order.userId?.name || 'Unknown' %></td>
+                <td><%= order.userId?.phone || 'N/A' %></td>
+                <td>KSH <%= order.finalAmount?.toLocaleString() %></td>
+                <td>
+                  <span class="badge badge-<%= 
+                    order.status === 'Delivered' ? 'success' : 
+                    order.status === 'Cancelled' ? 'danger' : 
+                    order.status === 'Pending Payment' ? 'warning' : 'info'
+                  %>"><%= order.status %></span>
+                </td>
+                <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                <td>
+                  <a href="/admin/orders/<%= order._id %>" class="btn btn-primary btn-sm">
+                    <i class="fas fa-eye"></i> View
+                  </a>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <% if (totalPages > 1) { %>
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <a href="/admin/orders?status=<%= selectedStatus %>&page=<%= i %>" 
+               class="btn <%= currentPage === i ? 'btn-primary' : 'btn-secondary' %> btn-sm"
+               style="min-width: 40px;">
+              <%= i %>
+            </a>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<div class="hero-section" style="min-height: 90vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 100px 20px;">
+  <div class="glass" style="padding: 60px; max-width: 800px;">
+    <h1 style="font-size: 48px; margin-bottom: 20px; line-height: 1.2;">
+      Fresh & Organic<br>
+      <span style="color: var(--sage-green);">Delivered to You</span>
+    </h1>
+    <p style="font-size: 18px; color: rgba(245, 240, 232, 0.8); margin-bottom: 30px;">
+      Farm-fresh vegetables, fruits, dairy, and more. Quality produce sourced directly from local farmers.
+    </p>
+    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+      <a href="/shop" class="btn btn-primary btn-lg">
+        <i class="fas fa-shopping-basket"></i> Shop Now
+      </a>
+      <a href="/about" class="btn btn-secondary btn-lg">
+        Learn More
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Featured Products -->
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Featured Products</h2>
+      <p>Handpicked fresh produce just for you</p>
+    </div>
+
+    <div class="grid grid-4">
+      <% featuredProducts.forEach(product => { %>
+        <div class="product-card" onclick="openProductModal('<%= product._id %>')">
+          <img src="<%= product.images[0] %>" alt="<%= product.name %>" class="product-image">
+          <div class="product-info">
+            <div class="product-category"><%= product.category %></div>
+            <div class="product-name"><%= product.name %></div>
+            <div class="product-price">KSH <%= product.price.toLocaleString() %></div>
+            <div class="product-actions">
+              <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); addToCart('<%= product._id %>')">
+                <i class="fas fa-plus"></i> Add
+              </button>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="/shop" class="btn btn-secondary">
+        View All Products <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Categories -->
+<section class="section" style="background: rgba(0, 0, 0, 0.3);">
+  <div class="container">
+    <div class="section-title">
+      <h2>Shop by Category</h2>
+      <p>Browse our wide selection of fresh produce</p>
+    </div>
+
+    <div class="grid grid-5">
+      <a href="/shop?category=Vegetables" class="glass" style="padding: 30px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
+        <i class="fas fa-carrot" style="font-size: 40px; color: var(--sage-green); margin-bottom: 15px;"></i>
+        <h4>Vegetables</h4>
+      </a>
+      <a href="/shop?category=Fruits" class="glass" style="padding: 30px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
+        <i class="fas fa-apple-alt" style="font-size: 40px; color: var(--sage-green); margin-bottom: 15px;"></i>
+        <h4>Fruits</h4>
+      </a>
+      <a href="/shop?category=Cereals" class="glass" style="padding: 30px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
+        <i class="fas fa-wheat" style="font-size: 40px; color: var(--sage-green); margin-bottom: 15px;"></i>
+        <h4>Cereals</h4>
+      </a>
+      <a href="/shop?category=Dairy+%26+Eggs" class="glass" style="padding: 30px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
+        <i class="fas fa-egg" style="font-size: 40px; color: var(--sage-green); margin-bottom: 15px;"></i>
+        <h4>Dairy & Eggs</h4>
+      </a>
+      <a href="/shop?category=Spices" class="glass" style="padding: 30px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
+        <i class="fas fa-pepper-hot" style="font-size: 40px; color: var(--sage-green); margin-bottom: 15px;"></i>
+        <h4>Spices</h4>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Why Choose Fresh Harvest?</h2>
+    </div>
+
+    <div class="grid grid-4">
+      <div class="glass" style="padding: 30px; text-align: center;">
+        <i class="fas fa-leaf" style="font-size: 40px; color: var(--sage-green); margin-bottom: 15px;"></i>
+        <h4>100% Organic</h4>
+        <p style="color: rgba(245, 240, 232, 0.7);">All our products are sourced from certified organic farms.</p>
+      </div>
+      <div class="glass" style="padding: 30px; text-align: center;">
+        <i class="fas fa-shipping-fast" style="font-size: 40px; color: var(--sage-green); margin-bottom: 15px;"></i>
+        <h4>Fast Delivery</h4>
+        <p style="color: rgba(245, 240, 232, 0.7);">Same-day delivery for orders placed before 2 PM.</p>
+      </div>
+      <div class="glass" style="padding: 30px; text-align: center;">
+        <i class="fas fa-award" style="font-size: 40px; color: var(--sage-green); margin-bottom: 15px;"></i>
+        <h4>Quality Guaranteed</h4>
+        <p style="color: rgba(245, 240, 232, 0.7);">Freshness guaranteed or your money back.</p>
+      </div>
+      <div class="glass" style="padding: 30px; text-align: center;">
+        <i class="fas fa-headset" style="font-size: 40px; color: var(--sage-green); margin-bottom: 15px;"></i>
+        <h4>24/7 Support</h4>
+        <p style="color: rgba(245, 240, 232, 0.7);">Our team is always ready to help you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Product Modal -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal-content glass" style="max-width: 800px; width: 90%; padding: 0; overflow: hidden;">
+    <div id="modalContent">
+      <!-- Content loaded dynamically -->
+    </div>
+  </div>
+</div>
+
+<script>
+  // Open product modal
+  async function openProductModal(productId) {
+    try {
+      const response = await fetch(`/shop/product/${productId}`);
+      const product = await response.json();
+
+      const modal = document.getElementById('productModal');
+      const content = document.getElementById('modalContent');
+
+      content.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr;">
+          <div style="background: rgba(0,0,0,0.2);">
+            <img src="${product.images[0]}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div style="padding: 40px;">
+            <button onclick="closeProductModal()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--cream); font-size: 24px; cursor: pointer;">
+              <i class="fas fa-times"></i>
+            </button>
+            <div class="product-category">${product.category}</div>
+            <h2 style="margin-bottom: 15px;">${product.name}</h2>
+            <div class="product-price" style="font-size: 24px; margin-bottom: 20px;">KSH ${product.price.toLocaleString()}</div>
+            <p style="color: rgba(245, 240, 232, 0.8); margin-bottom: 30px; line-height: 1.8;">${product.description}</p>
+            
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+              <span>Quantity:</span>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="qty-btn" onclick="decrementModalQty()">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <span id="modalQty" style="min-width: 30px; text-align: center;">1</span>
+                <button class="qty-btn" onclick="incrementModalQty()">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg" onclick="addModalToCart('${product._id}')" style="width: 100%;">
+              <i class="fas fa-shopping-cart"></i> Add to Cart
+            </button>
+
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--glass-border);">
+              <div style="display: flex; gap: 20px; font-size: 13px; color: rgba(245, 240, 232, 0.6);">
+                <span><i class="fas fa-check-circle" style="color: var(--sage-green);"></i> In Stock</span>
+                <span><i class="fas fa-truck" style="color: var(--sage-green);"></i> Free Delivery</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      modal.classList.add('active');
+    } catch (error) {
+      console.error('Failed to load product:', error);
+      showToast('Failed to load product details', 'error');
+    }
+  }
+
+  function closeProductModal() {
+    document.getElementById('productModal').classList.remove('active');
+  }
+
+  let modalQuantity = 1;
+
+  function incrementModalQty() {
+    modalQuantity++;
+    document.getElementById('modalQty').textContent = modalQuantity;
+  }
+
+  function decrementModalQty() {
+    if (modalQuantity > 1) {
+      modalQuantity--;
+      document.getElementById('modalQty').textContent = modalQuantity;
+    }
+  }
+
+  async function addModalToCart(productId) {
+    await addToCart(productId, modalQuantity);
+    closeProductModal();
+    modalQuantity = 1;
+  }
+
+  // Close modal on overlay click
+  document.getElementById('productModal').addEventListener('click', (e) => {
+    if (e.target.id === 'productModal') {
+      closeProductModal();
+    }
+  });
+</script>

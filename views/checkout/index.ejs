@@ -1,0 +1,270 @@
+<div class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Checkout</h2>
+      <p>Complete your order</p>
+    </div>
+
+    <div class="grid grid-2" style="align-items: start;">
+      <!-- Delivery Information -->
+      <div class="glass" style="padding: 30px;">
+        <h3 style="margin-bottom: 25px;"><i class="fas fa-truck" style="color: var(--sage-green); margin-right: 10px;"></i> Delivery Information</h3>
+        
+        <form id="checkoutForm">
+          <div class="form-group">
+            <label class="form-label">Landmark / Area</label>
+            <input type="text" name="landmark" class="form-input" placeholder="e.g., Westlands, Near Sarit Centre" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Building / House Number</label>
+            <input type="text" name="building" class="form-input" placeholder="e.g., Apartment 4B, Ngong Road" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Receiver's Phone Number</label>
+            <input type="tel" name="receiverPhone" class="form-input" placeholder="e.g., 0712345678" value="<%= user.phone %>" required>
+          </div>
+
+          <% if (canRedeemCoins) { %>
+            <div style="padding: 20px; background: rgba(122, 158, 126, 0.1); border-radius: 12px; margin-bottom: 20px;">
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" name="useCoins" id="useCoins" style="accent-color: var(--sage-green); width: 20px; height: 20px;">
+                <div>
+                  <div style="font-weight: 600;">Use <%= user.walletCoins %> Coins for Discount</div>
+                  <div style="font-size: 13px; color: rgba(245, 240, 232, 0.7);">Save up to KSH <%= maxDiscount %></div>
+                </div>
+              </label>
+            </div>
+          <% } %>
+        </form>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="glass" style="padding: 30px;">
+        <h3 style="margin-bottom: 25px;"><i class="fas fa-receipt" style="color: var(--sage-green); margin-right: 10px;"></i> Order Summary</h3>
+        
+        <div id="orderItems" style="margin-bottom: 20px;">
+          <% cart.forEach(item => { %>
+            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--glass-border);">
+              <div>
+                <div style="font-weight: 500;"><%= item.name %></div>
+                <div style="font-size: 12px; color: rgba(245, 240, 232, 0.6);">Qty: <%= item.quantity %></div>
+              </div>
+              <div style="font-weight: 600;">KSH <%= (item.price * item.quantity).toLocaleString() %></div>
+            </div>
+          <% }) %>
+        </div>
+
+        <div style="border-top: 2px solid var(--glass-border); padding-top: 15px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span>Subtotal</span>
+            <span>KSH <%= subtotal.toLocaleString() %></span>
+          </div>
+          <div id="discountRow" style="display: none; justify-content: space-between; margin-bottom: 10px; color: var(--sage-green);">
+            <span>Discount (Coins)</span>
+            <span>-KSH <span id="discountAmount">0</span></span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--glass-border);">
+            <span>Total</span>
+            <span style="color: var(--sage-green);">KSH <span id="finalTotal"><%= subtotal.toLocaleString() %></span></span>
+          </div>
+        </div>
+
+        <button type="button" onclick="showPaymentModal()" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 25px;" id="payBtn">
+          <i class="fas fa-money-bill-wave"></i> Complete Order
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal-content glass" style="max-width: 450px; width: 90%; padding: 0; overflow: hidden;">
+    <div style="padding: 30px;">
+      <div style="text-align: center; margin-bottom: 25px;">
+        <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--moss-green), var(--sage-green)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+          <i class="fas fa-mobile-alt" style="font-size: 30px; color: white;"></i>
+        </div>
+        <h3 style="margin-bottom: 5px;">M-Pesa Payment</h3>
+        <p style="color: rgba(245, 240, 232, 0.6); font-size: 14px;">Send money to complete your order</p>
+      </div>
+
+      <div id="paymentInstructions">
+        <div style="background: rgba(122, 158, 126, 0.15); border: 1px solid var(--sage-green); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+          <div style="text-align: center; margin-bottom: 15px;">
+            <div style="font-size: 12px; color: rgba(245, 240, 232, 0.6); margin-bottom: 5px;">Send Money To</div>
+            <div style="font-size: 28px; font-weight: 700; color: var(--sage-green); letter-spacing: 2px;"><%= settings.mpesaNumber %></div>
+          </div>
+          <div style="text-align: center; padding-top: 15px; border-top: 1px solid rgba(122, 158, 126, 0.3);">
+            <div style="font-size: 12px; color: rgba(245, 240, 232, 0.6); margin-bottom: 5px;">Confirmation Name</div>
+            <div style="font-size: 18px; font-weight: 600;"><%= settings.mpesaName %></div>
+          </div>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: rgba(245, 240, 232, 0.7);">Amount to Send</span>
+            <span style="font-size: 24px; font-weight: 700; color: var(--sage-green);">KSH <span id="modalAmount"><%= subtotal.toLocaleString() %></span></span>
+          </div>
+        </div>
+
+        <form id="confirmPaymentForm" onsubmit="confirmPayment(event)">
+          <div class="form-group">
+            <label class="form-label">M-Pesa Confirmation Code</label>
+            <input type="text" name="mpesaCode" id="mpesaCode" class="form-input" placeholder="e.g., QJ7H8K9L1M" maxlength="10" style="text-align: center; letter-spacing: 3px; font-size: 18px; text-transform: uppercase;" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;" id="confirmBtn">
+            <i class="fas fa-check-circle"></i> I've Sent the Money
+          </button>
+        </form>
+
+        <button type="button" onclick="closePaymentModal()" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">
+          Cancel
+        </button>
+      </div>
+
+      <div id="paymentSuccess" style="display: none; text-align: center;">
+        <div style="width: 80px; height: 80px; background: rgba(125, 216, 125, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+          <i class="fas fa-check" style="font-size: 40px; color: #7dd87d;"></i>
+        </div>
+        <h3 style="margin-bottom: 10px;">Payment Confirmed!</h3>
+        <p style="color: rgba(245, 240, 232, 0.7); margin-bottom: 25px;">Your order has been placed and is pending approval.</p>
+        <a href="" id="trackLink" class="btn btn-primary" style="width: 100%;">
+          <i class="fas fa-map-marker-alt"></i> Track Order
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const subtotal = <%= subtotal %>;
+  const coinValue = <%= settings.coinValue || 10 %>;
+  const userCoins = <%= user.walletCoins %>;
+  let currentOrderId = null;
+  let finalAmount = subtotal;
+  
+  // Update total when coins checkbox changes
+  document.getElementById('useCoins')?.addEventListener('change', function() {
+    updateTotal();
+  });
+
+  function updateTotal() {
+    const useCoins = document.getElementById('useCoins')?.checked;
+    const discountRow = document.getElementById('discountRow');
+    const discountAmountEl = document.getElementById('discountAmount');
+    const finalTotalEl = document.getElementById('finalTotal');
+    const modalAmountEl = document.getElementById('modalAmount');
+
+    if (useCoins) {
+      const maxDiscount = Math.floor(subtotal / coinValue) * coinValue;
+      const actualDiscount = Math.min(userCoins * coinValue, maxDiscount);
+      finalAmount = subtotal - actualDiscount;
+      
+      discountRow.style.display = 'flex';
+      discountAmountEl.textContent = actualDiscount.toLocaleString();
+      finalTotalEl.textContent = finalAmount.toLocaleString();
+      if (modalAmountEl) modalAmountEl.textContent = finalAmount.toLocaleString();
+    } else {
+      finalAmount = subtotal;
+      discountRow.style.display = 'none';
+      finalTotalEl.textContent = subtotal.toLocaleString();
+      if (modalAmountEl) modalAmountEl.textContent = subtotal.toLocaleString();
+    }
+  }
+
+  async function showPaymentModal() {
+    const form = document.getElementById('checkoutForm');
+    
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const payBtn = document.getElementById('payBtn');
+    payBtn.disabled = true;
+    payBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px;"></div> Processing...';
+
+    try {
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+
+      const response = await fetch('/checkout/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        currentOrderId = result.orderId;
+        document.getElementById('modalAmount').textContent = result.finalAmount.toLocaleString();
+        document.getElementById('paymentModal').classList.add('active');
+      } else {
+        showToast(result.error || 'Failed to create order', 'error');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      showToast('Failed to process checkout', 'error');
+    } finally {
+      payBtn.disabled = false;
+      payBtn.innerHTML = '<i class="fas fa-money-bill-wave"></i> Complete Order';
+    }
+  }
+
+  function closePaymentModal() {
+    document.getElementById('paymentModal').classList.remove('active');
+  }
+
+  async function confirmPayment(e) {
+    e.preventDefault();
+    
+    const mpesaCode = document.getElementById('mpesaCode').value.toUpperCase();
+    const confirmBtn = document.getElementById('confirmBtn');
+    
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<div class="spinner" style="width: 16px; height: 16px; border-width: 2px; display: inline-block; margin-right: 8px;"></div> Confirming...';
+
+    try {
+      const response = await fetch('/checkout/confirm-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: currentOrderId, mpesaCode })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Clear cart
+        localStorage.removeItem('freshharvest_cart');
+        
+        // Show success
+        document.getElementById('paymentInstructions').style.display = 'none';
+        document.getElementById('paymentSuccess').style.display = 'block';
+        document.getElementById('trackLink').href = `/track/${result.orderId}`;
+        
+        showToast('Payment confirmed successfully!', 'success');
+      } else {
+        showToast(result.error || 'Failed to confirm payment', 'error');
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Sent the Money';
+      }
+    } catch (error) {
+      console.error('Payment confirmation error:', error);
+      showToast('Failed to confirm payment', 'error');
+      confirmBtn.disabled = false;
+      confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Sent the Money';
+    }
+  }
+
+  // Close modal on overlay click
+  document.getElementById('paymentModal').addEventListener('click', (e) => {
+    if (e.target.id === 'paymentModal') {
+      closePaymentModal();
+    }
+  });
+</script>

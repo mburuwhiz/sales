@@ -1,0 +1,103 @@
+<div class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Welcome, <%= user.name %></h2>
+      <p>Manage your account and orders</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-4" style="margin-bottom: 40px;">
+      <div class="glass" style="padding: 25px; text-align: center;">
+        <i class="fas fa-shopping-bag" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
+        <div style="font-size: 24px; font-weight: 700;"><%= totalOrders %></div>
+        <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6);">Total Orders</div>
+      </div>
+      <div class="glass" style="padding: 25px; text-align: center;">
+        <i class="fas fa-clock" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
+        <div style="font-size: 24px; font-weight: 700;"><%= pendingOrders %></div>
+        <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6);">Pending Orders</div>
+      </div>
+      <div class="glass" style="padding: 25px; text-align: center;">
+        <i class="fas fa-coins" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
+        <div style="font-size: 24px; font-weight: 700;"><%= user.walletCoins %></div>
+        <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6);">Reward Coins</div>
+      </div>
+      <div class="glass" style="padding: 25px; text-align: center;">
+        <i class="fas fa-check-circle" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
+        <div style="font-size: 24px; font-weight: 700;">
+          <%= user.isEmailVerified && user.isPhoneVerified ? 'Verified' : 'Pending' %>
+        </div>
+        <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6);">Account Status</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-4" style="margin-bottom: 40px;">
+      <a href="/shop" class="glass" style="padding: 25px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
+        <i class="fas fa-shopping-basket" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
+        <h4>Shop Now</h4>
+      </a>
+      <a href="/account/orders" class="glass" style="padding: 25px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
+        <i class="fas fa-list" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
+        <h4>My Orders</h4>
+      </a>
+      <a href="/account/profile" class="glass" style="padding: 25px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
+        <i class="fas fa-user" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
+        <h4>My Profile</h4>
+      </a>
+      <a href="/account/help" class="glass" style="padding: 25px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
+        <i class="fas fa-question-circle" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
+        <h4>Need Help</h4>
+      </a>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="glass" style="padding: 30px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h3><i class="fas fa-history" style="color: var(--sage-green); margin-right: 10px;"></i> Recent Orders</h3>
+        <a href="/account/orders" class="btn btn-secondary btn-sm">View All</a>
+      </div>
+
+      <% if (recentOrders.length > 0) { %>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--glass-border);">
+                <th style="text-align: left; padding: 12px; font-weight: 600;">Order #</th>
+                <th style="text-align: left; padding: 12px; font-weight: 600;">Date</th>
+                <th style="text-align: left; padding: 12px; font-weight: 600;">Amount</th>
+                <th style="text-align: left; padding: 12px; font-weight: 600;">Status</th>
+                <th style="text-align: left; padding: 12px; font-weight: 600;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% recentOrders.forEach(order => { %>
+                <tr style="border-bottom: 1px solid rgba(122, 158, 126, 0.1);">
+                  <td style="padding: 12px;"><%= order.orderNumber %></td>
+                  <td style="padding: 12px;"><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                  <td style="padding: 12px;">KSH <%= order.finalAmount.toLocaleString() %></td>
+                  <td style="padding: 12px;">
+                    <span class="badge badge-<%= 
+                      order.status === 'Delivered' ? 'success' : 
+                      order.status === 'Cancelled' ? 'danger' : 
+                      order.status === 'Pending Payment' ? 'warning' : 'info'
+                    %>"><%= order.status %></span>
+                  </td>
+                  <td style="padding: 12px;">
+                    <a href="/account/orders/<%= order._id %>" class="btn btn-primary btn-sm">View</a>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div style="text-align: center; padding: 40px;">
+          <i class="fas fa-shopping-bag" style="font-size: 50px; color: var(--sage-green); opacity: 0.5; margin-bottom: 15px;"></i>
+          <p style="color: rgba(245, 240, 232, 0.7);">No orders yet. Start shopping!</p>
+          <a href="/shop" class="btn btn-primary" style="margin-top: 15px;">Browse Products</a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>

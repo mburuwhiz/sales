@@ -1,0 +1,321 @@
+<!-- Cart Drawer -->
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h3 style="display: flex; align-items: center; gap: 12px; font-size: 20px;">
+      <i class="fas fa-shopping-cart" style="color: var(--sage-green);"></i> 
+      Your Cart
+    </h3>
+    <button onclick="toggleCart()" style="background: rgba(255,255,255,0.1); border: none; color: var(--cream); font-size: 18px; cursor: pointer; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <div class="cart-body" id="cartBody">
+    <!-- Cart items will be rendered here -->
+    <div class="empty-state">
+      <i class="fas fa-shopping-basket"></i>
+      <h3>Your cart is empty</h3>
+      <p style="color: rgba(245, 240, 232, 0.6);">Add some fresh products to get started</p>
+      <a href="/shop" class="btn btn-primary" style="margin-top: 10px;" onclick="toggleCart()">
+        Start Shopping
+      </a>
+    </div>
+  </div>
+
+  <div class="cart-footer" id="cartFooter" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--glass-border);">
+      <span style="font-size: 16px;">Subtotal</span>
+      <span id="cartSubtotal" style="font-size: 22px; font-weight: 700; color: var(--sage-green);">KSH 0</span>
+    </div>
+    <a href="/checkout" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="toggleCart()">
+      Proceed to Checkout <i class="fas fa-arrow-right"></i>
+    </a>
+    <button onclick="clearCart()" class="btn btn-secondary" style="width: 100%;">
+      <i class="fas fa-trash-alt"></i> Clear Cart
+    </button>
+
+    <!-- You Might Like Section -->
+    <div class="upsell-section">
+      <div class="upsell-title"><i class="fas fa-lightbulb"></i> You Might Like</div>
+      <div class="upsell-card" id="upsellCard" onclick="addUpsellToCart()">
+        <img src="" alt="" class="upsell-image" id="upsellImage">
+        <div class="upsell-info">
+          <div class="upsell-name" id="upsellName"></div>
+          <div class="upsell-price" id="upsellPrice"></div>
+        </div>
+        <i class="fas fa-plus-circle" style="color: var(--sage-green); font-size: 20px;"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cart Overlay -->
+<div class="modal-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+
+<script>
+  // Cart state
+  let cart = JSON.parse(localStorage.getItem('freshharvest_cart')) || [];
+  let allProducts = [];
+  let upsellInterval = null;
+  let currentUpsellProduct = null;
+
+  // Load all products for upsell
+  async function loadAllProducts() {
+    try {
+      const response = await fetch('/shop/api/all');
+      allProducts = await response.json();
+      startUpsellRotation();
+    } catch (error) {
+      console.error('Failed to load products:', error);
+    }
+  }
+
+  // Toggle cart drawer
+  function toggleCart() {
+    const drawer = document.getElementById('cartDrawer');
+    const overlay = document.getElementById('cartOverlay');
+    drawer.classList.toggle('active');
+    overlay.classList.toggle('active');
+    
+    if (drawer.classList.contains('active')) {
+      renderCart();
+    }
+  }
+
+  // Render cart
+  function renderCart() {
+    const cartBody = document.getElementById('cartBody');
+    const cartFooter = document.getElementById('cartFooter');
+    const cartCount = document.getElementById('cartCount');
+
+    if (cart.length === 0) {
+      cartBody.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-shopping-basket"></i>
+          <h3>Your cart is empty</h3>
+          <p style="color: rgba(245, 240, 232, 0.6);">Add some fresh products to get started</p>
+          <a href="/shop" class="btn btn-primary" style="margin-top: 10px;" onclick="toggleCart()">
+            Start Shopping
+          </a>
+        </div>
+      `;
+      cartFooter.style.display = 'none';
+      if (cartCount) cartCount.style.display = 'none';
+      return;
+    }
+
+    cartFooter.style.display = 'block';
+    if (cartCount) {
+      cartCount.style.display = 'flex';
+      cartCount.textContent = cart.length;
+    }
+
+    let html = '';
+    let subtotal = 0;
+
+    cart.forEach(item => {
+      const itemTotal = item.price * item.quantity;
+      subtotal += itemTotal;
+
+      html += `
+        <div class="cart-item">
+          <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+          <div class="cart-item-details">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-price">KSH ${item.price.toLocaleString()}</div>
+            <div class="cart-item-controls">
+              <button class="qty-btn" onclick="updateQuantity('${item.productId}', ${item.quantity - 1})">
+                <i class="fas fa-minus"></i>
+              </button>
+              <span style="font-weight: 600; min-width: 24px; text-align: center;">${item.quantity}</span>
+              <button class="qty-btn" onclick="updateQuantity('${item.productId}', ${item.quantity + 1})">
+                <i class="fas fa-plus"></i>
+              </button>
+              <button class="qty-btn" onclick="removeFromCart('${item.productId}')" style="margin-left: auto; background: rgba(139, 38, 53, 0.3); border-color: rgba(255, 122, 138, 0.3);">
+                <i class="fas fa-trash" style="color: #ff7a8a;"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    cartBody.innerHTML = html;
+    document.getElementById('cartSubtotal').textContent = `KSH ${subtotal.toLocaleString()}`;
+  }
+
+  // Update quantity
+  async function updateQuantity(productId, quantity) {
+    if (quantity <= 0) {
+      removeFromCart(productId);
+      return;
+    }
+
+    const item = cart.find(i => i.productId === productId);
+    if (item) {
+      item.quantity = quantity;
+      saveCart();
+      renderCart();
+
+      // Sync with server if logged in
+      <% if (user) { %>
+      try {
+        await fetch('/cart/update', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId, quantity })
+        });
+      } catch (error) {
+        console.error('Sync error:', error);
+      }
+      <% } %>
+    }
+  }
+
+  // Remove from cart
+  async function removeFromCart(productId) {
+    cart = cart.filter(i => i.productId !== productId);
+    saveCart();
+    renderCart();
+    showToast('Item removed from cart', 'info');
+
+    // Sync with server if logged in
+    <% if (user) { %>
+    try {
+      await fetch(`/cart/remove/${productId}`, { method: 'DELETE' });
+    } catch (error) {
+      console.error('Sync error:', error);
+    }
+    <% } %>
+  }
+
+  // Clear cart
+  async function clearCart() {
+    if (!confirm('Are you sure you want to clear your cart?')) return;
+    
+    cart = [];
+    saveCart();
+    renderCart();
+    showToast('Cart cleared', 'info');
+
+    // Sync with server if logged in
+    <% if (user) { %>
+    try {
+      await fetch('/cart/clear', { method: 'DELETE' });
+    } catch (error) {
+      console.error('Sync error:', error);
+    }
+    <% } %}
+  }
+
+  // Add to cart
+  async function addToCart(productId, quantity = 1) {
+    try {
+      const response = await fetch('/cart/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId, quantity })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        cart = data.cart;
+        saveCart();
+        renderCart();
+        showToast('Item added to cart!', 'success');
+        
+        // Open cart drawer
+        const drawer = document.getElementById('cartDrawer');
+        if (!drawer.classList.contains('active')) {
+          toggleCart();
+        }
+      } else {
+        showToast(data.error || 'Failed to add item', 'error');
+      }
+    } catch (error) {
+      console.error('Add to cart error:', error);
+      showToast('Failed to add item', 'error');
+    }
+  }
+
+  // Save cart to localStorage
+  function saveCart() {
+    localStorage.setItem('freshharvest_cart', JSON.stringify(cart));
+  }
+
+  // You Might Like - Upsell Rotation
+  function startUpsellRotation() {
+    if (upsellInterval) clearInterval(upsellInterval);
+    
+    updateUpsell();
+    upsellInterval = setInterval(updateUpsell, 10000);
+  }
+
+  function updateUpsell() {
+    if (allProducts.length === 0 || cart.length === 0) {
+      document.querySelector('.upsell-section').style.display = 'none';
+      return;
+    }
+
+    const cartProductIds = cart.map(item => item.productId);
+    const availableProducts = allProducts.filter(p => !cartProductIds.includes(p._id));
+
+    if (availableProducts.length === 0) {
+      document.querySelector('.upsell-section').style.display = 'none';
+      return;
+    }
+
+    document.querySelector('.upsell-section').style.display = 'block';
+    const randomProduct = availableProducts[Math.floor(Math.random() * availableProducts.length)];
+    currentUpsellProduct = randomProduct;
+
+    const upsellCard = document.getElementById('upsellCard');
+    
+    // Fade out
+    upsellCard.style.opacity = '0';
+    
+    setTimeout(() => {
+      document.getElementById('upsellImage').src = randomProduct.images[0];
+      document.getElementById('upsellImage').alt = randomProduct.name;
+      document.getElementById('upsellName').textContent = randomProduct.name;
+      document.getElementById('upsellPrice').textContent = `KSH ${randomProduct.price.toLocaleString()}`;
+      
+      // Fade in
+      upsellCard.style.opacity = '1';
+    }, 300);
+  }
+
+  function addUpsellToCart() {
+    if (currentUpsellProduct) {
+      addToCart(currentUpsellProduct._id);
+    }
+  }
+
+  // Initialize cart on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    renderCart();
+    loadAllProducts();
+
+    // Sync cart with server if logged in
+    <% if (user) { %>
+    const localCart = JSON.parse(localStorage.getItem('freshharvest_cart')) || [];
+    if (localCart.length > 0) {
+      fetch('/cart/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ localCart })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          cart = data.cart;
+          saveCart();
+          renderCart();
+        }
+      })
+      .catch(err => console.error('Cart sync error:', err));
+    }
+    <% } %}
+  });
+</script>

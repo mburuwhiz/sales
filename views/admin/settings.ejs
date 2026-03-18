@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <style>
+    .admin-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid var(--glass-border);
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .admin-sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .admin-sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cream);
+      text-decoration: none;
+    }
+
+    .admin-nav {
+      list-style: none;
+      padding: 15px 0;
+    }
+
+    .admin-nav li a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: rgba(245, 240, 232, 0.8);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .admin-nav li a:hover,
+    .admin-nav li a.active {
+      background: rgba(122, 158, 126, 0.2);
+      color: var(--cream);
+    }
+
+    .admin-main {
+      margin-left: 260px;
+      padding: 30px;
+      min-height: 100vh;
+    }
+
+    @media (max-width: 768px) {
+      .admin-sidebar { transform: translateX(-100%); }
+      .admin-sidebar.active { transform: translateX(0); }
+      .admin-main { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-header">
+      <a href="/admin" class="admin-sidebar-logo">
+        <img src="/logo.png" alt="Fresh Harvest">
+        <span style="font-weight: 700;">ADMIN</span>
+      </a>
+    </div>
+    <ul class="admin-nav">
+      <li><a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="/admin/products"><i class="fas fa-box"></i> Products</a></li>
+      <li><a href="/admin/orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+      <li><a href="/admin/emails"><i class="fas fa-envelope"></i> Email Broadcast</a></li>
+      <li><a href="/admin/help-requests"><i class="fas fa-question-circle"></i> Help Requests</a></li>
+      <li><a href="/admin/settings" class="active"><i class="fas fa-cog"></i> Settings</a></li>
+      <li><a href="/admin/settings/whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+      <li style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+        <a href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div style="margin-bottom: 30px;">
+      <h2>Settings</h2>
+      <p style="color: rgba(245, 240, 232, 0.6);">Configure your store settings</p>
+    </div>
+
+    <% if (message) { %>
+      <div class="toast <%= message.type %>" style="margin-bottom: 20px; animation: none;">
+        <i class="fas fa-<%= message.type === 'success' ? 'check-circle' : 'exclamation-circle' %>"></i> 
+        <%= message.text %>
+      </div>
+    <% } %>
+
+    <div class="glass" style="padding: 30px; max-width: 800px;">
+      <form action="/admin/settings" method="POST">
+        <h3 style="margin-bottom: 20px; color: var(--sage-green);"><i class="fas fa-coins"></i> Loyalty Program</h3>
+        
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">Minimum Purchase for Coins (KSH)</label>
+            <input type="number" name="minPurchaseForCoins" class="form-input" value="<%= settings.minPurchaseForCoins || 2000 %>" min="0" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Coins Awarded per Purchase</label>
+            <input type="number" name="coinsPerPurchase" class="form-input" value="<%= settings.coinsPerPurchase || 100 %>" min="0" required>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">Minimum Coins to Redeem</label>
+            <input type="number" name="minCoinsToRedeem" class="form-input" value="<%= settings.minCoinsToRedeem || 500 %>" min="0" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Coin Value (KSH per coin)</label>
+            <input type="number" name="coinValue" class="form-input" value="<%= settings.coinValue || 10 %>" min="1" required>
+          </div>
+        </div>
+
+        <h3 style="margin: 30px 0 20px; color: var(--sage-green);"><i class="fas fa-money-bill-wave"></i> M-Pesa Settings</h3>
+        
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">M-Pesa Number (for manual payments)</label>
+            <input type="text" name="mpesaNumber" class="form-input" value="<%= settings.mpesaNumber || '0113323234' %>" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">M-Pesa Account Name</label>
+            <input type="text" name="mpesaName" class="form-input" value="<%= settings.mpesaName || 'Peter Wekulo' %>" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 20px;">
+          <i class="fas fa-save"></i> Save Settings
+        </button>
+      </form>
+    </div>
+  </main>
+</body>
+</html>

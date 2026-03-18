@@ -1,0 +1,64 @@
+<div class="section">
+  <div class="container">
+    <div style="max-width: 500px; margin: 0 auto;">
+      <div class="glass" style="padding: 40px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <i class="fas fa-user-plus" style="font-size: 60px; color: var(--sage-green); margin-bottom: 15px;"></i>
+          <h2>Create Account</h2>
+          <p style="color: rgba(245, 240, 232, 0.7);">Join Fresh Harvest for fresh produce delivered to your door</p>
+        </div>
+
+        <% if (error) { %>
+          <div class="toast error" style="margin-bottom: 20px; animation: none;">
+            <i class="fas fa-exclamation-circle"></i> <%= error %>
+          </div>
+        <% } %>
+
+        <form action="/auth/register" method="POST">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="name" class="form-input" placeholder="Enter your full name" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" class="form-input" placeholder="Enter your email" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" name="phone" class="form-input" placeholder="e.g., 0712345678" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-input" placeholder="Create a password (min 6 characters)" minlength="6" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" name="confirmPassword" class="form-input" placeholder="Confirm your password" required>
+          </div>
+
+          <div style="margin-bottom: 20px;">
+            <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 13px; color: rgba(245, 240, 232, 0.7);">
+              <input type="checkbox" required style="margin-top: 3px; accent-color: var(--sage-green);">
+              I agree to the <a href="#" style="color: var(--sage-green);">Terms of Service</a> and <a href="#" style="color: var(--sage-green);">Privacy Policy</a>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 20px;">
+            <i class="fas fa-user-plus"></i> Create Account
+          </button>
+        </form>
+
+        <div style="text-align: center; padding-top: 20px; border-top: 1px solid var(--glass-border);">
+          <p style="color: rgba(245, 240, 232, 0.7);">
+            Already have an account? 
+            <a href="/auth/login" style="color: var(--sage-green); font-weight: 500;">Sign in</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

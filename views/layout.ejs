@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head') %>
+</head>
+<body>
+  <!-- Background Images -->
+  <div class="bg-container bg-desktop"></div>
+  <div class="bg-container bg-mobile"></div>
+
+  <!-- Navigation -->
+  <%- include('partials/navbar') %>
+
+  <!-- Cart Drawer -->
+  <%- include('partials/cart-drawer') %>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <%- body %>
+  </main>
+
+  <!-- Footer -->
+  <%- include('partials/footer') %>
+
+  <script>
+    // Global toast function
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      const icon = type === 'success' ? 'check-circle' : 
+                   type === 'error' ? 'exclamation-circle' : 'info-circle';
+      
+      toast.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+      container.appendChild(toast);
+
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        toast.classList.add('hiding');
+        setTimeout(() => toast.remove(), 300);
+      }, 5000);
+    }
+
+    // Show toast from server message
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const message = urlParams.get('message');
+      const messageType = urlParams.get('type') || 'info';
+      
+      if (message) {
+        showToast(decodeURIComponent(message), messageType);
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    });
+  </script>
+</body>
+</html>
