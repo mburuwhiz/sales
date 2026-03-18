@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Broadcast Emails | Fresh Harvest</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="nav-links">
+    <span>Admin Panel</span>
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/orders">Orders</a>
+    <a href="/admin/emails">Emails</a>
+  </div>
+  <div style="padding: 20px; max-width: 800px; margin: 0 auto;">
+    <h2>Send Broadcast Campaign</h2>
+    <div class="glass-panel">
+      <form id="broadcastForm">
+        <input type="text" id="subject" placeholder="Campaign Subject" required style="width: 100%; padding: 8px; margin-bottom: 15px;">
+        <textarea id="rawHtml" placeholder="Paste your RAW HTML Email Template here..." required style="width: 100%; height: 300px; padding: 8px; margin-bottom: 15px;"></textarea>
+        <input type="text" id="recipients" placeholder="Recipients (comma separated emails)" required style="width: 100%; padding: 8px; margin-bottom: 15px;">
+        <button type="submit" class="btn-primary" style="width: 100%;">Send via Service B (Brevo)</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="/js/notifications.js"></script>
+  <script>
+    document.getElementById('broadcastForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const subject = document.getElementById('subject').value;
+      const rawHtml = document.getElementById('rawHtml').value;
+      const recipients = document.getElementById('recipients').value.split(',').map(r => r.trim());
+
+      try {
+        const res = await fetch('/admin/emails/broadcast', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subject, rawHtml, recipients })
+        });
+
+        if (res.ok) {
+          showToast('Broadcast campaign fired successfully!', 'success');
+          document.getElementById('broadcastForm').reset();
+        } else {
+          showToast('Failed to send broadcast.', 'error');
+        }
+      } catch(err) {
+        showToast('Error sending broadcast.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

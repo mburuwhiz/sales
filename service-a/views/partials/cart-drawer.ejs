@@ -1,0 +1,21 @@
+<div id="cart-drawer" class="cart-drawer" style="transform: translateX(100%); transition: transform 0.3s ease;">
+  <div class="glass-panel" style="height: 100vh; overflow-y: auto;">
+    <h2>Your Cart</h2>
+    <div id="cart-items"></div>
+    <div class="cart-total">
+      Subtotal: KSH <span id="cart-subtotal">0</span>
+    </div>
+
+    <div class="upsell-section" style="margin-top: 20px;">
+      <h3>You Might Like</h3>
+      <div id="upsell-card" class="glass-panel" style="transition: opacity 0.5s ease;">
+        <img id="upsell-img" src="" alt="Upsell Image" style="width: 100px; height: 100px; object-fit: cover;">
+        <p id="upsell-name"></p>
+        <p id="upsell-price"></p>
+        <button class="btn-primary" onclick="addUpsellToCart()">Quick Add</button>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="proceedToCheckout()" style="width: 100%; margin-top: 20px;">Proceed to Checkout</button>
+  </div>
+</div>

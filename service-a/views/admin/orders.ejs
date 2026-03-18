@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Orders | Fresh Harvest</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .nav-links { display: flex; gap: 15px; padding: 20px; background: rgba(0,0,0,0.5); }
+    .nav-links a { color: var(--text-light); text-decoration: none; font-weight: bold; }
+    .order-card { margin-bottom: 20px; padding: 15px; }
+  </style>
+</head>
+<body>
+  <div class="nav-links">
+    <span>Admin Panel</span>
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/orders">Orders</a>
+    <a href="/admin/products">Products</a>
+  </div>
+
+  <div style="padding: 20px;">
+    <h2>Manage Orders</h2>
+    <% orders.forEach(order => { %>
+      <div class="glass-panel order-card">
+        <h3>Order: <%= order._id %></h3>
+        <p>User: <%= order.userId ? order.userId.name : 'Unknown' %> (<%= order.userId ? order.userId.phone : 'N/A' %>)</p>
+        <p>Total: KSH <%= order.totalAmount %></p>
+        <p>Status: <%= order.status %></p>
+        <div style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
+          <h4>Update Timeline</h4>
+          <select id="status_<%= order._id %>" style="padding: 5px; margin-right: 10px;">
+            <option>Pending</option>
+            <option>Approved</option>
+            <option>Packing</option>
+            <option>En-Route</option>
+            <option>Delivered</option>
+          </select>
+          <input type="text" id="note_<%= order._id %>" placeholder="Note (e.g. Rider: John)" style="padding: 5px; margin-right: 10px;">
+          <button class="btn-primary" onclick="updateOrder('<%= order._id %>')">Update & Notify</button>
+        </div>
+      </div>
+    <% }) %>
+    <% if(orders.length === 0) { %>
+      <p>No orders found.</p>
+    <% } %>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="/js/notifications.js"></script>
+  <script>
+    async function updateOrder(id) {
+      const status = document.getElementById(`status_${id}`).value;
+      const note = document.getElementById(`note_${id}`).value;
+
+      try {
+        const res = await fetch('/admin/orders/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: id, status, note })
+        });
+
+        if (res.ok) {
+          showToast('Order updated and user notified via WhatsApp!', 'success');
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          showToast('Failed to update order', 'error');
+        }
+      } catch(err) {
+        showToast('Error', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fresh Harvest | Track Order</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .timeline { border-left: 2px solid var(--moss-green); padding-left: 20px; margin-top: 20px; }
+    .timeline-item { margin-bottom: 15px; position: relative; }
+    .timeline-item::before { content: ''; position: absolute; left: -26px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--moss-green); border: 2px solid var(--text-light); }
+  </style>
+</head>
+<body>
+  <div class="glass-panel" style="max-width: 600px; margin: 40px auto;">
+    <h2>Order Tracking</h2>
+    <p><strong>Order ID:</strong> <%= order._id %></p>
+    <p><strong>Status:</strong> <%= order.status %></p>
+    <p><strong>Total Amount:</strong> KSH <%= order.totalAmount %></p>
+
+    <h3>Timeline</h3>
+    <div class="timeline">
+      <% order.trackingTimeline.forEach(entry => { %>
+        <div class="timeline-item">
+          <strong><%= entry.status %></strong> - <%= new Date(entry.time).toLocaleString() %><br>
+          <em><%= entry.note %></em>
+        </div>
+      <% }) %>
+      <% if(order.trackingTimeline.length === 0) { %>
+        <p>No timeline updates yet.</p>
+      <% } %>
+    </div>
+
+    <a href="/shop" class="btn-primary" style="display: inline-block; margin-top: 20px; text-decoration: none;">Back to Shop</a>
+  </div>
+</body>
+</html>

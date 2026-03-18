@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Products | Fresh Harvest</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+  <style>
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
+    .product-card { cursor: pointer; text-align: center; }
+    .product-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; }
+    .nav-links { display: flex; gap: 15px; padding: 20px; background: rgba(0,0,0,0.5); }
+    .nav-links a { color: var(--text-light); text-decoration: none; font-weight: bold; }
+    #image-cropper-container { max-width: 400px; margin: 10px 0; display: none; }
+  </style>
+</head>
+<body>
+  <div class="nav-links">
+    <span>Admin Panel</span>
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/orders">Orders</a>
+    <a href="/admin/products">Products</a>
+  </div>
+
+  <div style="padding: 20px;">
+    <h2>Manage Products</h2>
+    <div class="glass-panel" style="margin-bottom: 20px;">
+      <h3>Add New Product</h3>
+      <form id="addProductForm">
+        <input type="text" id="name" placeholder="Name" required style="width: 100%; padding: 8px; margin-bottom: 10px;">
+        <select id="category" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+          <option>Vegetables</option>
+          <option>Fruits</option>
+          <option>Cereals</option>
+          <option>Dairy & Eggs</option>
+          <option>Spices</option>
+        </select>
+        <input type="number" id="price" placeholder="Price (KSH)" required style="width: 100%; padding: 8px; margin-bottom: 10px;">
+        <input type="number" id="stockQty" placeholder="Stock Quantity" required style="width: 100%; padding: 8px; margin-bottom: 10px;">
+        <textarea id="description" placeholder="Description" required style="width: 100%; padding: 8px; margin-bottom: 10px;"></textarea>
+
+        <input type="file" id="imageInput" accept="image/*" style="margin-bottom: 10px;">
+        <div id="image-cropper-container">
+          <img id="imagePreview" style="max-width: 100%;">
+          <button type="button" id="cropBtn" class="btn-primary" style="margin-top: 10px;">Crop & Save</button>
+        </div>
+
+        <input type="hidden" id="imageBase64">
+
+        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Add Product</button>
+      </form>
+    </div>
+
+    <div class="grid">
+      <% products.forEach(product => { %>
+        <div class="glass-panel product-card">
+          <img src="<%= product.images[0] || '/logo.png' %>" alt="<%= product.name %>">
+          <h3 style="margin: 10px 0;"><%= product.name %></h3>
+          <p>KSH <%= product.price %></p>
+          <p>Stock: <%= product.stockQty %></p>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="/js/notifications.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script>
+    let cropper;
+
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('imagePreview').src = e.target.result;
+          document.getElementById('image-cropper-container').style.display = 'block';
+
+          if(cropper) cropper.destroy();
+          cropper = new Cropper(document.getElementById('imagePreview'), {
+            aspectRatio: 1,
+            viewMode: 1
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    document.getElementById('cropBtn').addEventListener('click', () => {
+      if(cropper) {
+        const canvas = cropper.getCroppedCanvas({ width: 800, height: 800 });
+        const base64 = canvas.toDataURL('image/jpeg', 0.8);
+        document.getElementById('imageBase64').value = base64;
+        showToast('Image cropped successfully!', 'success');
+      }
+    });
+
+    document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const payload = {
+        name: document.getElementById('name').value,
+        category: document.getElementById('category').value,
+        price: document.getElementById('price').value,
+        stockQty: document.getElementById('stockQty').value,
+        description: document.getElementById('description').value,
+        imageBase64: document.getElementById('imageBase64').value
+      };
+
+      try {
+        const res = await fetch('/admin/products/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          showToast('Product added successfully!', 'success');
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          showToast('Failed to add product', 'error');
+        }
+      } catch(err) {
+        showToast('Error', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+node_modules
+service-a/node_modules
+service-b/node_modules
+.env

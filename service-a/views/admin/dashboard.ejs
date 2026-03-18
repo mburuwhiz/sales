@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard | Fresh Harvest</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px; }
+    .stat-card { text-align: center; }
+    .stat-card h3 { margin-bottom: 10px; }
+    .nav-links { display: flex; gap: 15px; padding: 20px; background: rgba(0,0,0,0.5); }
+    .nav-links a { color: var(--text-light); text-decoration: none; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="nav-links">
+    <span>Admin Panel</span>
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/orders">Orders</a>
+    <a href="/admin/products">Products</a>
+    <a href="/admin/emails">Emails</a>
+    <a href="/admin/settings/whatsapp">WhatsApp</a>
+    <a href="/shop">View Shop</a>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="glass-panel stat-card">
+      <h3>Quick Links</h3>
+      <a href="/admin/orders" class="btn-primary" style="display: block; margin-bottom: 10px; text-decoration: none;">Manage Orders</a>
+      <a href="/admin/products" class="btn-primary" style="display: block; text-decoration: none;">Manage Products</a>
+    </div>
+    <div class="glass-panel stat-card">
+      <h3>System Status</h3>
+      <p>Service A: Online</p>
+      <p>Service B: Online</p>
+      <p>WhatsApp: Connected</p>
+    </div>
+  </div>
+</body>
+</html>

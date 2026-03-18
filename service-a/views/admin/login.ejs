@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login | Fresh Harvest</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="glass-panel" style="max-width: 400px; margin: 100px auto;">
+    <h2>Admin Login</h2>
+    <form id="adminLoginForm">
+      <div style="margin-bottom: 15px;">
+        <label>Email</label>
+        <input type="email" id="email" required style="width: 100%; padding: 8px;">
+      </div>
+      <div style="margin-bottom: 15px;">
+        <label>Password</label>
+        <input type="password" id="password" required style="width: 100%; padding: 8px;">
+      </div>
+      <button type="submit" class="btn-primary" style="width: 100%;">Login to Dashboard</button>
+    </form>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="/js/notifications.js"></script>
+  <script>
+    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          window.location.href = '/admin';
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch(err) {
+        showToast('Login failed', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fresh Harvest | Register</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="glass-panel" style="max-width: 400px; margin: 100px auto;">
+    <h2>Register</h2>
+    <form id="registerForm">
+      <div style="margin-bottom: 15px;">
+        <label>Name</label>
+        <input type="text" id="name" required style="width: 100%; padding: 8px;">
+      </div>
+      <div style="margin-bottom: 15px;">
+        <label>Email</label>
+        <input type="email" id="email" required style="width: 100%; padding: 8px;">
+      </div>
+      <div style="margin-bottom: 15px;">
+        <label>Password</label>
+        <input type="password" id="password" required style="width: 100%; padding: 8px;">
+      </div>
+      <div style="margin-bottom: 15px;">
+        <label>Phone (e.g. +254700000000)</label>
+        <input type="text" id="phone" required style="width: 100%; padding: 8px;">
+      </div>
+      <button type="submit" class="btn-primary" style="width: 100%;">Register</button>
+    </form>
+
+    <div id="verifyPhoneSection" style="display: none; margin-top: 20px; border-top: 1px solid #ccc; padding-top: 20px;">
+      <h3>Verify Phone</h3>
+      <p style="font-size: 14px; margin-bottom: 10px;">Check WhatsApp for your code.</p>
+      <input type="text" id="verificationCode" placeholder="Enter Code" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+      <button onclick="verifyPhone()" class="btn-primary" style="width: 100%;">Verify</button>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="/js/notifications.js"></script>
+  <script>
+    let registeredEmail = '';
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const phone = document.getElementById('phone').value;
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, phone })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showToast(data.message, 'success');
+          registeredEmail = email;
+          document.getElementById('registerForm').style.display = 'none';
+          document.getElementById('verifyPhoneSection').style.display = 'block';
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch(err) {
+        showToast('Registration failed', 'error');
+      }
+    });
+
+    async function verifyPhone() {
+      const code = document.getElementById('verificationCode').value;
+      try {
+        const res = await fetch('/api/auth/verify-phone', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: registeredEmail, code })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showToast('Phone verified! Please also check your email to verify.', 'success');
+          setTimeout(() => { window.location.href = '/login'; }, 3000);
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch(err) {
+        showToast('Verification failed', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

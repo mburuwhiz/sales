@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; }
+    .container { max-width: 600px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; }
+    .btn { display: inline-block; padding: 10px 20px; background-color: #556B2F; color: #fff; text-decoration: none; border-radius: 5px; }
+    .header { text-align: center; margin-bottom: 20px; color: #556B2F; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Order Approved 📦</h2>
+    </div>
+    <p>Your order <strong><%= orderId %></strong> for <strong><%= amount %></strong> has been approved!</p>
+    <a href="<%= trackingLink %>" class="btn">Track Your Order</a>
+  </div>
+</body>
+</html>

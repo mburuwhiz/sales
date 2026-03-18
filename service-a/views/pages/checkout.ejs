@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fresh Harvest | Checkout</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .checkout-container { max-width: 600px; margin: 40px auto; }
+  </style>
+</head>
+<body>
+  <div class="checkout-container glass-panel">
+    <h2>Checkout</h2>
+    <div id="checkout-items" style="margin-bottom: 20px;"></div>
+    <h3>Delivery Details</h3>
+    <form id="checkoutForm">
+      <div style="margin-bottom: 15px;">
+        <label>Receiver Phone</label>
+        <input type="text" id="receiverPhone" required style="width: 100%; padding: 8px;">
+      </div>
+      <div style="margin-bottom: 15px;">
+        <label>Landmark/Building</label>
+        <input type="text" id="landmark" required style="width: 100%; padding: 8px;">
+      </div>
+      <div style="margin-bottom: 15px;">
+        <input type="checkbox" id="useCoins"> <label>Use Wallet Coins (if eligible)</label>
+      </div>
+      <button type="submit" class="btn-primary" style="width: 100%;">Confirm & Pay (M-Pesa)</button>
+    </form>
+
+    <div id="manual-payment" style="display: none; margin-top: 20px; border-top: 1px solid #ccc; padding-top: 20px;">
+      <p style="color: red; font-weight: bold;">STK Push Failed or Manual Payment Required.</p>
+      <p>Please pay KSH <span id="manual-amount"></span> to <br><strong>0113 323 234 (Peter Wekulo)</strong></p>
+      <input type="text" id="mpesaCode" placeholder="Paste M-Pesa Code" style="width: 100%; padding: 8px; margin-top: 10px;">
+      <button class="btn-primary" onclick="submitManualPayment()" style="width: 100%; margin-top: 10px;">Submit Confirmation</button>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="/js/notifications.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cart = JSON.parse(localStorage.getItem('whizpoint_cart') || '[]');
+      if(cart.length === 0) {
+        alert('Cart is empty');
+        window.location.href = '/shop';
+      }
+
+      const container = document.getElementById('checkout-items');
+      let total = 0;
+      cart.forEach(item => {
+        total += item.price * item.quantity;
+        container.innerHTML += `<p>${item.name} x ${item.quantity} = KSH ${item.price * item.quantity}</p>`;
+      });
+      container.innerHTML += `<strong>Total: KSH ${total}</strong>`;
+      document.getElementById('manual-amount').textContent = total;
+    });
+
+    document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const cart = JSON.parse(localStorage.getItem('whizpoint_cart') || '[]');
+      const items = cart.map(i => ({ productId: i.id, quantity: i.quantity, price: i.price }));
+      const deliveryData = {
+        receiverPhone: document.getElementById('receiverPhone').value,
+        landmark: document.getElementById('landmark').value
+      };
+      const useCoins = document.getElementById('useCoins').checked;
+
+      // Smart Cart Sync logic explicitly executed here as per spec before checkout
+      try {
+        await fetch('/api/auth/sync-cart', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ cart: items })
+        });
+      } catch (err) {
+        console.warn('Failed to sync cart, proceeding with checkout payload');
+      }
+
+      try {
+        const res = await fetch('/shop/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items, deliveryData, useCoins })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          showToast('Payment successful via M-Pesa!', 'success');
+          localStorage.removeItem('whizpoint_cart');
+          setTimeout(() => { window.location.href = `/track/${data.orderId}`; }, 2000);
+        } else {
+          showToast(data.message, 'error');
+          document.getElementById('manual-payment').style.display = 'block';
+        }
+      } catch(err) {
+        showToast('Checkout failed', 'error');
+      }
+    });
+
+    function submitManualPayment() {
+      // In a real app, this would verify the code with Daraja API or manual admin review.
+      showToast('Manual payment submitted for review.', 'success');
+      localStorage.removeItem('whizpoint_cart');
+      setTimeout(() => { window.location.href = '/shop'; }, 2000);
+    }
+  </script>
+</body>
+</html>

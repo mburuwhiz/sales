@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fresh Harvest | Shop</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
+    .product-card { cursor: pointer; text-align: center; }
+    .product-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center; background: var(--glass-bg); backdrop-filter: blur(10px);">
+    <h1>🌿 Fresh Harvest</h1>
+    <button class="btn-primary" onclick="toggleCartDrawer()">🛒 Cart</button>
+  </div>
+
+  <div class="grid">
+    <% products.forEach(product => { %>
+      <div class="glass-panel product-card" onclick='openProductModal(<%- JSON.stringify(product) %>)'>
+        <img src="<%= product.images[0] || '/logo.png' %>" alt="<%= product.name %>">
+        <h3 style="margin: 10px 0;"><%= product.name %></h3>
+        <p>KSH <%= product.price %></p>
+      </div>
+    <% }) %>
+  </div>
+
+  <%- include('../partials/cart-drawer') %>
+
+  <div id="product-modal" class="modal-overlay">
+    <div class="glass-panel modal-content">
+      <span onclick="closeProductModal()" style="float: right; cursor: pointer; font-size: 20px;">&times;</span>
+      <img id="modal-img" src="" style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+      <h2 id="modal-title"></h2>
+      <p id="modal-price" style="font-weight: bold; margin: 10px 0;"></p>
+      <p id="modal-desc" style="margin-bottom: 15px;"></p>
+      <div style="margin-bottom: 15px;">
+        <label>Quantity: </label>
+        <input type="number" id="modal-qty" value="1" min="1" style="width: 60px; padding: 5px;">
+      </div>
+      <button class="btn-primary" onclick="addToCartFromModal()" style="width: 100%;">Add to Cart</button>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="/js/notifications.js"></script>
+  <script src="/js/cart.js"></script>
+  <script>
+    // Initialize all products for the You Might Like engine
+    window.allProducts = <%- JSON.stringify(products) %>;
+
+    let selectedProduct = null;
+
+    function openProductModal(product) {
+      selectedProduct = product;
+      document.getElementById('modal-img').src = product.images[0] || '/logo.png';
+      document.getElementById('modal-title').textContent = product.name;
+      document.getElementById('modal-price').textContent = `KSH ${product.price}`;
+      document.getElementById('modal-desc').textContent = product.description;
+      document.getElementById('product-modal').classList.add('active');
+    }
+
+    function closeProductModal() {
+      document.getElementById('product-modal').classList.remove('active');
+      selectedProduct = null;
+    }
+
+    function addToCartFromModal() {
+      if(selectedProduct) {
+        const qty = parseInt(document.getElementById('modal-qty').value) || 1;
+        const productToAdd = {
+          id: selectedProduct._id,
+          name: selectedProduct.name,
+          price: selectedProduct.price
+        };
+        // Add multiple times or handle quantity correctly via updateQuantity in a real implementation
+        // For our simplified cart logic, we push multiple or update existing
+        const cart = getCart();
+        const existing = cart.find(item => item.id === productToAdd.id);
+        if (existing) {
+          existing.quantity += qty;
+        } else {
+          cart.push({ ...productToAdd, quantity: qty });
+        }
+        saveCart(cart);
+        if(window.showToast) window.showToast(`${productToAdd.name} added to cart!`);
+
+        closeProductModal();
+      }
+    }
+  </script>
+</body>
+</html>
