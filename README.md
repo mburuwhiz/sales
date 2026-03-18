@@ -1,400 +1,206 @@
-# 🌿 Fresh Harvest Grocery - E-Commerce Platform
-
-A complete, production-ready e-commerce platform for organic grocery delivery with dual microservices architecture.
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Features](#features)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage](#usage)
-- [API Documentation](#api-documentation)
-- [WhatsApp Integration](#whatsapp-integration)
-- [M-Pesa Integration](#m-pesa-integration)
-- [Email Templates](#email-templates)
-
-## 🎯 Overview
-
-Fresh Harvest Grocery is a full-stack e-commerce solution built with:
-- **Service A (Core Hub)**: Node.js + Express + EJS + MongoDB
-- **Service B (Mailer Microservice)**: Express + Brevo SMTP
-- **WhatsApp Engine**: @whiskeysockets/baileys
-- **Payment**: M-Pesa Daraja API
-- **Image Storage**: Cloudinary
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        CLIENT                               │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-│  │   Desktop   │  │   Mobile    │  │   Admin Dashboard   │ │
-│  │  (wide.png) │  │ (narrow.png)│  │                     │ │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     SERVICE A (Port 3000)                   │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-│  │   Express   │  │    EJS      │  │     MongoDB         │ │
-│  │   Server    │  │   Views     │  │   (Mongoose)        │ │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-│  │   WhatsApp  │  │   M-Pesa    │  │   Cloudinary        │ │
-│  │   Baileys   │  │   Daraja    │  │   Images            │ │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     SERVICE B (Port 3001)                   │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-│  │   Express   │  │    EJS      │  │      Brevo          │ │
-│  │   Server    │  │  Templates  │  │     SMTP/API        │ │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## ✨ Features
-
-### Customer Features
-- 🛍️ Browse products by category (Vegetables, Fruits, Cereals, Dairy & Eggs, Spices)
-- 🔍 Search products with filters
-- 🛒 Smart cart with localStorage persistence
-- 💡 "You Might Like" upsell engine (rotates every 10 seconds)
-- 📱 Responsive design with mobile hamburger menu
-- 🔐 Email & WhatsApp verification
-- 💳 M-Pesa STK Push payment
-- 📦 Real-time order tracking
-- 🪙 Loyalty coin system
-- 🆘 Help/Contact form
-
-### Admin Features
-- 📊 Dashboard with statistics and charts
-- 📦 Product CRUD with Cropper.js image editing
-- 📋 Order management with status updates
-- 📧 Email broadcast system
-- 💬 WhatsApp connection management
-- ⚙️ Settings (loyalty program, M-Pesa)
-- 🎫 Help request management
-
-### Technical Features
-- 🎨 Glassmorphism UI with organic earth-tone theme
-- 🔔 Modern toast notifications (no default alerts)
-- 📱 Fixed background images (wide.png/narrow.png)
-- 🔒 Secure session management with MongoDB store
-- 🔄 Cron jobs for abandoned cart reminders
-- 📧 Transactional emails via Brevo
-- 💬 WhatsApp notifications via Baileys
-
-## 🚀 Installation
-
-### Prerequisites
-- Node.js 16+
-- MongoDB Atlas account
-- Cloudinary account
-- Brevo (Sendinblue) account
-- M-Pesa Daraja API credentials (for production)
-
-### Step 1: Clone and Setup
-
-```bash
-cd fresh-harvest-grocery
-```
-
-### Step 2: Install Dependencies
-
-```bash
-# Service A
-cd service-a
-npm install
-
-# Service B
-cd ../service-b
-npm install
-```
-
-### Step 3: Environment Configuration
+ENSURE YOU ADRESS ALL THESE PARTS
 
-Copy `.env.example` to `.env` in both services and fill in your credentials:
-
-**Service A (.env):**
-```env
-PORT=3000
-NODE_ENV=production
-CLIENT_URL=https://yourdomain.com
-DATABASE_URL=mongodb+srv://...
-SESSION_SECRET=your_secret_key
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=secure_password
-MAILER_MICROSERVICE_URL=http://localhost:3001/api/v1/send-email
-MICROSERVICE_API_KEY=shared_secret_key
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-MPESA_CONSUMER_KEY=your_key
-MPESA_CONSUMER_SECRET=your_secret
-MPESA_PASSKEY=your_passkey
-MPESA_SHORTCODE=your_shortcode
-MPESA_CALLBACK_URL=https://yourdomain.com/api/mpesa/callback
-```
-
-**Service B (.env):**
-```env
-PORT=3001
-MICROSERVICE_API_KEY=shared_secret_key
-BREVO_API_KEY=your_brevo_key
-BREVO_SENDER_EMAIL=orders@freshharvest.app
-BREVO_SENDER_NAME=FRESH HARVEST
-BREVO_REPLY_TO=admin@freshharvest.app
-```
-
-### Step 4: Add Background Images
-
-Place your background images in:
-- `service-a/public/images/wide.png` (desktop)
-- `service-a/public/images/narrow.png` (mobile)
-
-### Step 5: Add Logo and Favicon
-
-Place in `service-a/public/`:
-- `logo.png` - Your store logo
-- `favicon.ico` - Browser favicon
-
-### Step 6: Start Services
-
-```bash
-# Terminal 1 - Service A
-cd service-a
-npm start
+logo.png, favicon.ico, wide.png and narrow.png are in public/images
 
-# Terminal 2 - Service B
-cd service-b
-npm start
-```
-
-## ⚙️ Configuration
-
-### WhatsApp Setup
-
-1. Go to `/admin/settings/whatsapp`
-2. Click "Connect"
-3. Scan the QR code with WhatsApp on your phone
-4. You'll receive a confirmation message
-
-### M-Pesa Setup (Production)
-
-1. Register for Daraja API at https://developer.safaricom.co.ke
-2. Get your consumer key, secret, and passkey
-3. Configure callback URL (must be HTTPS)
-4. Update `.env` with credentials
-
-### Cloudinary Setup
-
-1. Create account at https://cloudinary.com
-2. Get your cloud name, API key, and secret
-3. Update `.env` with credentials
-
-### Brevo Setup
-
-1. Create account at https://www.brevo.com
-2. Generate API key
-3. Verify sender domain
-4. Update `.env` with credentials
+🌿 FRESH HARVEST GROCERY: THE ULTIMATE TECHNICAL SPECIFICATION
 
-## 📖 Usage
+BRAND & VISUAL IDENTITY Website Name: FRESH HARVEST GROCERY. Email Sender Name: FRESH HARVEST. Favicon : favicon.ico (on root) Logo: logo.png (on root)
 
-### Customer Flow
+Color Palette: Organic Earth-Tone Greenish Theme. Not high-contrast neon; instead, deep forest greens, moss, and rich browns.
 
-1. **Browse**: Visit homepage or `/shop` to browse products
-2. **Add to Cart**: Click products to view details and add to cart
-3. **Checkout**: Go to `/checkout` (requires login + verification)
-4. **Payment**: Pay via M-Pesa STK Push or manual payment
-5. **Track**: Use `/track/:orderId` to track order status
+Background Architecture: * Desktop: Fixed wide.png background.
 
-### Admin Flow
+Mobile: Fixed narrow.png background.
 
-1. **Login**: Go to `/admin/login`
-2. **Dashboard**: View statistics and recent orders
-3. **Products**: Add/edit products with image cropping
-4. **Orders**: Update order status (triggers WhatsApp notifications)
-5. **Emails**: Send broadcast emails to customers
-6. **WhatsApp**: Manage WhatsApp connection
+UI Containers: All cards, menus, and modals use Glassmorphism (semi-transparent dark green/black overlays with backdrop-filter: blur(10px) and subtle borders) to ensure 100% text readability against realistic backgrounds.
 
-## 📚 API Documentation
+Responsiveness: Full mobile-first design. Desktop sidebar categories collapse into a Native Hamburger Menu on mobile.
 
-### Authentication
+SYSTEM ARCHITECTURE & MICROSERVICES Service A: The Core Hub (Node.js + Express + EJS) Houses the database connection, user sessions, WhatsApp client, and Admin Dashboard. WhatsApp Engine: Uses @whiskeysockets/baileys.
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/auth/login` | POST | User login |
-| `/auth/register` | POST | User registration |
-| `/auth/verify-email` | GET | Email verification |
-| `/auth/verify-phone` | POST | Phone verification |
+Session Storage: Session data is stored in the MongoDB whatsapp_sessions collection, not locally, ensuring persistence across server restarts or deployments.
 
-### Products
+Admin Linking: Admin scans QR on /admin/settings/whatsapp. Upon success, the system sends a "Message Yourself" notification to the admin: ✅ FRESH HARVEST SERVER CONNECTED.
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/shop` | GET | List products |
-| `/shop/product/:id` | GET | Get product details |
-| `/shop/api/all` | GET | Get all products (for cart) |
+Service B: The Mailer Microservice (Express + Brevo SMTP) Standalone service. Holds all hardcoded transactional HTML templates (Welcome, Verification, Order Receipt, Tracking Update).
 
-### Cart
+Security: Only accepts requests from Service A via an API_KEY header.
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/cart` | GET | Get cart contents |
-| `/cart/add` | POST | Add item to cart |
-| `/cart/update` | PUT | Update quantity |
-| `/cart/remove/:id` | DELETE | Remove item |
-| `/cart/sync` | POST | Sync localStorage cart |
+Flexibility: Includes a /broadcast endpoint where the Admin can POST a complete, raw HTML string (for custom offers/discounts) which the microservice then fires via Brevo.
 
-### Checkout
+DATABASE (MONGODB) & SCHEMA DESIGN Users: _id, name, email, password (bcrypt), phone, isEmailVerified, isPhoneVerified, walletCoins, role (user/admin). Products: _id, name, category (Vegetables, Fruits, Cereals, Dairy & Eggs, Spices), price (KSH), stockQty, description, images (Cloudinary URLs).
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/checkout` | GET | Checkout page |
-| `/checkout/process` | POST | Process payment |
-| `/checkout/confirm-manual` | POST | Confirm manual payment |
+Orders:
 
-### M-Pesa
+userId, items (Array), totalAmount, status (Pending/Approved/Packing/En-Route/Delivered).
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/mpesa/callback` | POST | M-Pesa callback |
-| `/api/mpesa/query/:id` | GET | Query payment status |
+deliveryData: { landmark, building, receiverPhone, coords }.
 
-### WhatsApp
+mpesaData: { receiptCode, transactionDate, amount }.
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/whatsapp/status` | GET | Get connection status |
-| `/api/whatsapp/connect` | POST | Connect WhatsApp |
-| `/api/whatsapp/disconnect` | POST | Disconnect WhatsApp |
-| `/api/whatsapp/send-test` | POST | Send test message |
+trackingTimeline: [{ status: String, time: Date, note: String, updatedBy: 'Admin' }].
 
-### Admin
+Need Help: _id, userId, subject, message, status (Open/Closed).
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/admin/login` | POST | Admin login |
-| `/admin/products` | GET/POST | Product management |
-| `/admin/orders` | GET | Order list |
-| `/admin/orders/:id` | GET | Order detail |
-| `/admin/orders/:id/update-status` | POST | Update order status |
-| `/admin/settings` | GET/POST | Settings |
-| `/admin/emails/broadcast` | POST | Send broadcast email |
+AUTHENTICATION & VERIFICATION FLOW Registration: User signs up on /register. Email Verification: Service A pings Service B. Service B sends an ultra-modern HTML email with a unique verification link.
 
-## 💬 WhatsApp Integration
+WhatsApp Verification: Service A sends a WhatsApp message via Baileys.
 
-WhatsApp notifications use the following format:
+Message Format: 🌿 FRESH HARVEST GROCERY \n\n Your verification code is: 123456 \n\n Please enter this on the website to verify your phone.
 
-```
-*FRESH HARVEST*
+CTA Button: The WhatsApp message includes a List Button or URL Button (if the WhatsApp API version allows) pointing to the verification page.
 
-Your message here
+Security: Users cannot access the Checkout page until both isEmailVerified and isPhoneVerified are true.
 
-_Details wrapped in underscores_
-`Codes wrapped in backticks`
+THE SHOPPING & CHECKOUT EXPERIENCE Product Grid: Clicking a product opens a Popup Modal. It shows multiple images (Cloudinary), detailed description, and a quantity selector. Smart Cart: A side-drawer popup. Bottom section features "You Might Like": Every 10 seconds, it randomly selects a product not currently in the cart and displays it as a "Quick Add" suggestion.
 
-[Link to tracking page]
-```
+The Checkout Page:
 
-### Notification Types
+User selects location via Map or Landmark typing.
 
-1. **Order Confirmation**: Sent to admin when new order received
-2. **Tracking Updates**: Sent to customer when status changes
-3. **Verification Codes**: 6-digit codes for phone verification
+User inputs receiving person’s phone.
 
-## 💳 M-Pesa Integration
+The M-Pesa Trigger: User clicks "Confirm & Pay". The system triggers an STK Push.
 
-### STK Push Flow
+Fallback/Manual: If STK fails, the UI shows: Please Pay to 0113 323 234 (Peter Wekulo) and paste the confirmation message below.
 
-1. Customer clicks "Pay with M-Pesa"
-2. System initiates STK Push to customer's phone
-3. Customer enters PIN on phone
-4. M-Pesa sends callback to server
-5. Order status updated to "Pending"
-6. Admin receives WhatsApp notification
+Order Confirmation: Once paid, the system verifies the callback and updates the database.
 
-### Manual Payment (Fallback)
+ADMIN DASHBOARD & ORDER MANAGEMENT The 3-Minute Window: Once a user pays, the Admin receives an Immediate WhatsApp Alert: 🚨 NEW ORDER RECEIVED \n\n Amount: KSH 1500 \n Customer: John Doe \n\n Please approve within 3 minutes. Manual Tracking Updates: Admin goes to /admin/orders/:id.
 
-If STK Push fails, customers can:
-1. Pay manually to displayed number
-2. Enter M-Pesa confirmation code
-3. Order is marked for manual verification
+They can select status (e.g., "Left Packing Station").
 
-## 📧 Email Templates
+They type a custom note (e.g., "Rider: David, Bike: KMC 123").
 
-Service B includes the following email templates:
+The Pulse: This action triggers a WhatsApp to the user: 📦 ORDER UPDATE \n\n Status: Left Packing Station \n Note: Rider: David, Bike: KMC 123 \n\n Click here to track: [LINK].
 
-1. **welcome.ejs** - New user registration
-2. **receipt.ejs** - Order confirmation
-3. **tracking.ejs** - Order status updates
-4. **whatsapp-alert.ejs** - WhatsApp disconnection alert
-5. **abandoned-cart.ejs** - Cart abandonment reminder
+Product Management: Admin uploads images. A Cropper.js tool allows them to crop and position perfectly before the Base64 data is sent to Cloudinary.
 
-## 🎨 Customization
+NOTIFICATION FORMATTING & LOGIC All system notifications sent via WhatsApp must follow these strict formatting rules: Headers: Wrapped in * (e.g., FRESH HARVEST).
 
-### Colors
+Status/Timestamps: Wrapped in _ (e.g., Updated at 2:00 PM).
 
-Edit CSS variables in `views/partials/head.ejs`:
+Codes/IDs/Rider Details: Wrapped in (e.g., ORDER-12345 `).
 
-```css
-:root {
-  --forest-green: #1a3d1c;
-  --moss-green: #2d5a27;
-  --sage-green: #7a9e7e;
-  --earth-brown: #4a3728;
-  --cream: #f5f0e8;
-}
-```
+Buttons: Every notification message includes a link to the unique tracking page (/track/:orderId) or the account profile.
 
-### Loyalty Program
+ROUTE ARCHITECTURE Public Routes GET / - Home Shop GET /login - User Login
 
-Configure in Admin → Settings:
-- Minimum purchase for coins
-- Coins awarded per purchase
-- Minimum coins to redeem
-- Coin value (KSH per coin)
+GET /register - User Registration
 
-## 🔒 Security
+GET /track/:id - Unique Tracking Page (Dynamic Sugesstions on sidebar)
 
-- All passwords hashed with bcrypt
-- Sessions stored in MongoDB
-- API key protection for microservices
-- CORS configured for Service B
-- Input validation on all forms
+Admin Routes (Auth-Protected) GET /admin/login - Admin Login (Separate from User)
 
-## 🐛 Troubleshooting
+GET /admin - Main Dashboard
 
-### WhatsApp Not Connecting
-- Check if session exists in MongoDB
-- Delete session and reconnect
-- Ensure phone has internet
+GET /admin/products - CRUD Product with Cloudinary + Cropper.js
 
-### M-Pesa Callback Not Working
-- Verify callback URL is HTTPS
-- Check if URL is accessible
-- Review server logs
+GET /admin/orders - Order Approval & Tracking Timeline Updates
 
-### Emails Not Sending
-- Verify Brevo API key
-- Check sender domain verification
-- Review Service B logs
+GET /admin/emails - Paste RAW HTML for broadcast campaigns
 
-## 📄 License
+GET /admin/settings/whatsapp - Baileys QR Scan & Link Session
 
-MIT License - Feel free to use for commercial projects.
+LOYALTY & REWARDS Coin Logic: Admin sets a "Minimum Purchase" (e.g., KSH 2000). Redemption: If a purchase exceeds this, the user earns X coins (set by admin).
 
-## 🙏 Support
+Redeeming: On checkout, if user coins > Admin set threshold, a "Redeem for Discount" button appears.
 
-For support, email admin@freshharvest.app or WhatsApp 0113 323 234.
+THE SMART CART MECHANICS & "YOU MIGHT LIKE" ENGINE The cart must function without reloading the page, maintaining state, and actively upselling the user. Cart State Management: * The cart lives in the user's Browser Local Storage (localStorage.getItem('whizpoint_cart')). This ensures the cart persists even if they close the tab before logging in.
 
----
+When the user logs in or proceeds to /checkout, the Local Storage cart is parsed and synced with the Express Session/MongoDB.
 
-Built with ❤️ by Fresh Harvest Grocery Team
+The UI (EJS Partial - /views/partials/cart-drawer.ejs):
+
+It is a fixed-position right-side drawer (transform: translateX(100%) hidden, translateX(0) visible).
+
+Contains an array of items with + and - buttons. Clicking these triggers a frontend JS function that updates the quantity in Local Storage and instantly recalculates the Subtotal.
+
+The "You Might Like" Algorithm (Upsell):
+
+The Logic: On page load, the server passes an array of all available products to the frontend window object (e.g., window.allProducts).
+
+The Filter: A JavaScript function filters out any product IDs currently in the whizpoint_cart.
+
+The Rotator: A setInterval(updateUpsell, 10000) runs in the background. Every 10 seconds, it randomly selects one item from the filtered list, applies a fade-out/fade-in CSS transition, and updates the Upsell Card's image, name, and price at the bottom of the cart.
+
+ADMIN IMAGE PIPELINE: CROPPER.JS TO CLOUDINARY You demanded 100% control over the product images to maintain the "greenish, realistic" aesthetic. Here is the exact data flow to prevent admins from uploading distorted or massive images. Step 1: The Admin Upload (Frontend):
+
+Admin navigates to /admin/products/add.
+
+Admin clicks an .
+
+Instead of uploading immediately, a FileReader loads the image onto a hidden
+
+Step 2: Cropper.js Execution:
+
+The modal initializes new Cropper(imageElement, { aspectRatio: 1 / 1, viewMode: 1 }).
+
+This forces the admin to crop the image to a perfect square (so the frontend UI grid never breaks).
+
+Step 3: Base64 Conversion & Transmission:
+
+Admin clicks "Save Crop".
+
+Frontend JS runs cropper.getCroppedCanvas({ width: 800, height: 800 }).toDataURL('image/jpeg', 0.8).
+
+This generates an optimized Base64 string. The string is added to the hidden form payload along with the Title, Price, and Category, and POSTed to the Express server.
+
+Step 4: Cloudinary Upload (Backend POST /admin/products/add):
+
+Node.js receives the Base64 string.
+
+Executes: cloudinary.uploader.upload(req.body.imageBase64, { folder: "fresh_harvest/products" }).
+
+Cloudinary returns a secure URL (e.g., https://res.cloudinary.com/.../kale.jpg).
+
+Express saves this URL to the images array in the MongoDB Product document.
+
+THE MAILER MICROSERVICE (SERVICE B) DEEP DIVE This is how your secondary server actually handles the emails without bogging down the main e-commerce server. The Infrastructure: It is a separate Express app running on a different port or host (e.g., https://mailer.freshharvest.app).
+
+The Automated Templates (Stored in Service B):
+
+Service B contains its own /views/emails/ folder containing EJS templates for welcome.ejs, receipt.ejs, and tracking.ejs.
+
+These templates are styled with ultra-modern inline CSS, featuring the FRESH HARVEST logo, dark-green button accents, and neat typography.
+
+The API Handshake:
+
+When an order is approved, Service A (Main App) makes an Axios request:
+
+JSON POST /api/v1/send-email { "apiKey": "YOUR_SECRET_MICROSERVICE_KEY", "action": "order_approved", "recipientEmail": "user@gmail.com", "recipientName": "John Doe", "variables": { "orderId": "ORD-123", "amount": "KSH 1500", "trackingLink": "https://freshharvest.app/track/ORD-123" } } Service B Execution:
+
+Service B verifies the apiKey.
+
+It uses ejs.renderFile('views/emails/receipt.ejs', req.body.variables) to inject the dynamic data into the beautiful HTML.
+
+It passes the final compiled HTML string to the Brevo Node.js SDK (SibApiV3Sdk.TransactionalEmailsApi()).
+
+Brevo sends the email with sender: { name: "FRESH HARVEST", email: "orders@freshharvest.app" } and replyTo: { email: "admin@freshharvest.app" }.
+
+The Manual Broadcast (Admin Upload):
+
+If req.body.action === "custom_broadcast", Service B bypasses its local EJS templates.
+
+Instead, it takes the raw HTML string the Admin pasted into the dashboard (req.body.rawHtml), wraps it in the Brevo SDK, and fires it to the provided email list.
+
+WhatsApp Disconnect: WhatsApp periodically forces web sessions to log out for security.
+
+Logic: The system catches the connection.update event in Baileys looking for statusCode === 401.
+
+Action: Service A immediately falls back to Service B (Mailer) to send an urgent email to the Admin: "URGENT: WhatsApp Session Disconnected. Please log into the dashboard and re-scan the QR code."
+
+Abandoned Carts (Automated Cron Job):
+
+Logic: A node-cron task runs every 12 hours. It looks for orders with status: "Pending Payment" older than 2 hours.
+
+Action: Triggers Service B to send a "Did you forget something?" email template with a link back to their cart.
+
+SECURITY MIDDLEWARE ARCHITECTURE Every route must be protected by strict Express middleware to prevent unauthorized access. isUser() Middleware: Checks the session. If no session exists, redirects to /login. Applies to /checkout and /account.
+
+isAdmin() Middleware: Checks if req.session.role === 'admin'. If not, destroys the session and redirects to /admin/login. Applies to all /admin/* routes.
+
+verifyMicroservice() Middleware: Only lives on Service B. Checks if req.body.apiKey === process.env.MICROSERVICE_API_KEY. If it doesn't match, it returns HTTP 401 Unauthorized and drops the request to prevent spam bots from using your Brevo account.
+
+All the notifications in the system to be mordern, like perfect toast notofications or popup htmls and no default notification to be seen,
+
