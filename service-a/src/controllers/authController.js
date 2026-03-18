@@ -28,7 +28,7 @@ exports.register = async (req, res) => {
     // Trigger Service B for email
     try {
       await axios.post(process.env.MAILER_MICROSERVICE_URL, {
-        apiKey: process.env.MICROSERVICE_API_KEY,
+        apiKey: process.env.MAILER_API_KEY,
         action: 'verify_email',
         recipientEmail: email,
         recipientName: name,

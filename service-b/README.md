@@ -5,13 +5,14 @@ Handles Brevo SMTP and HTML email generation. Accepts raw HTML for admin broadca
 ## Environment Configuration Blueprint (.env)
 
 ```env
-# Application Core
-PORT=4000
-NODE_ENV=production
-
-# Microservice Security
-MICROSERVICE_API_KEY=your_shared_secret_key_between_servers
-
-# Brevo SMTP Configuration
-BREVO_API_KEY=your_brevo_api_key
+PORT=5000
+BREVO_SMTP_HOST=smtp-relay.brevo.com
+BREVO_SMTP_PORT=587
+BREVO_SMTP_USER=a4ded8001@smtp-brevo.com
+BREVO_SMTP_PASS=xsmtpsib-a4f6ab8a198..........3a2-KBNuTpx6HBe2HHw2
+MAILER_API_KEY=superemailsender2trdr
+DEFAULT_FROM_EMAIL="ewebb@whizpoint.app"
+DEFAULT_FROM_NAME="EWEBB CYBER"
+REPLY_TO_EMAIL="ewebb@whizpoint.app"
+BASE_WEBSITE_URL="http://localhost:5173"
 ```

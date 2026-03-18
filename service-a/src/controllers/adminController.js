@@ -95,7 +95,7 @@ exports.sendBroadcast = async (req, res) => {
     const { rawHtml, subject, recipients } = req.body;
 
     await axios.post(process.env.MAILER_MICROSERVICE_URL, {
-      apiKey: process.env.MICROSERVICE_API_KEY,
+      apiKey: process.env.MAILER_API_KEY,
       action: 'custom_broadcast',
       variables: {
         rawHtml,

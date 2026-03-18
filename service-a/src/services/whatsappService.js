@@ -43,7 +43,7 @@ async function connectToWhatsApp() {
          console.log('URGENT: WhatsApp Session Disconnected. Alerting Admin.');
          try {
            await axios.post(process.env.MAILER_MICROSERVICE_URL, {
-             apiKey: process.env.MICROSERVICE_API_KEY,
+             apiKey: process.env.MAILER_API_KEY,
              action: 'custom_broadcast',
              variables: {
                subject: 'URGENT: WhatsApp Session Disconnected',

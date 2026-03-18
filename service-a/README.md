@@ -19,7 +19,7 @@ ADMIN_PASSWORD=secure_admin_password_here
 
 # Microservice Communication
 MAILER_MICROSERVICE_URL=https://mailer.freshharvest.app/api/v1/send-email
-MICROSERVICE_API_KEY=your_shared_secret_key_between_servers
+MAILER_API_KEY=superemailsender2trdr
 
 # Cloudinary (Image Pipeline)
 CLOUDINARY_CLOUD_NAME=your_cloud_name
