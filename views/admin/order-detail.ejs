@@ -50,6 +50,7 @@
       color: var(--cream);
     }
 
+    .mobile-nav-toggle { display: none; }
     .admin-main {
       margin-left: 260px;
       padding: 30px;
@@ -88,8 +89,12 @@
     }
 
     @media (max-width: 768px) {
+      .mobile-nav-toggle { display: block; position: fixed; top: 20px; right: 20px; z-index: 1000; background: var(--sage-green); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .mobile-nav-toggle { display: none; }
+      .admin-main { padding-top: 80px; }
       .admin-sidebar { transform: translateX(-100%); }
       .admin-sidebar.active { transform: translateX(0); }
+    .mobile-nav-toggle { display: none; }
       .admin-main { margin-left: 0; }
     }
   </style>
@@ -119,6 +124,7 @@
 
   <!-- Main Content -->
   <main class="admin-main">
+    <div class="mobile-nav-toggle" onclick="document.querySelector('.admin-sidebar').classList.toggle('active')"><i class="fas fa-bars"></i></div>
     <div style="margin-bottom: 30px;">
       <a href="/admin/orders" class="btn btn-secondary btn-sm">
         <i class="fas fa-arrow-left"></i> Back to Orders

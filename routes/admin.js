@@ -170,6 +170,7 @@ router.get('/products', isAdmin, async (req, res) => {
       title: 'Products - Admin Dashboard',
       products: [],
       categories: [],
+      selectedCategory: '',
       currentPage: 1,
       totalPages: 1
     });

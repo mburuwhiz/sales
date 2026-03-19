@@ -51,15 +51,9 @@ const useMongoAuthState = async (sessionId) => {
   }
 
   return {
-    state: {
-      creds: data.creds,
-      keys: data.keys
-    },
+    state: data,
     saveCreds: async () => {
-      await writeData({
-        creds: data.creds,
-        keys: data.keys
-      });
+      await writeData(data);
     }
   };
 };
@@ -242,5 +236,6 @@ module.exports = {
   sendTrackingUpdate,
   sendVerificationCode,
   getConnectionStatus,
-  disconnectWhatsApp
+  disconnectWhatsApp,
+  useMongoAuthState
 };

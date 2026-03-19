@@ -50,6 +50,7 @@
       color: var(--cream);
     }
 
+    .mobile-nav-toggle { display: none; }
     .admin-main {
       margin-left: 260px;
       padding: 30px;
@@ -84,8 +85,12 @@
     }
 
     @media (max-width: 768px) {
+      .mobile-nav-toggle { display: block; position: fixed; top: 20px; right: 20px; z-index: 1000; background: var(--sage-green); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .mobile-nav-toggle { display: none; }
+      .admin-main { padding-top: 80px; }
       .admin-sidebar { transform: translateX(-100%); }
       .admin-sidebar.active { transform: translateX(0); }
+    .mobile-nav-toggle { display: none; }
       .admin-main { margin-left: 0; }
     }
   </style>
@@ -115,6 +120,7 @@
 
   <!-- Main Content -->
   <main class="admin-main">
+    <div class="mobile-nav-toggle" onclick="document.querySelector('.admin-sidebar').classList.toggle('active')"><i class="fas fa-bars"></i></div>
     <div style="margin-bottom: 30px;">
       <h2>WhatsApp Settings</h2>
       <p style="color: rgba(245, 240, 232, 0.6);">Manage WhatsApp notifications</p>
@@ -131,16 +137,21 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button onclick="connectWhatsApp()" class="btn btn-primary">
-            <i class="fas fa-plug"></i> Connect
-          </button>
-          <button onclick="disconnectWhatsApp()" class="btn btn-secondary">
-            <i class="fas fa-unlink"></i> Disconnect
-          </button>
-          <button onclick="checkStatus()" class="btn btn-secondary">
-            <i class="fas fa-sync"></i> Refresh
-          </button>
+        <div style="margin-bottom: 20px;">
+          <label class="form-label" style="display: block; margin-bottom: 8px;">Connect via External Session ID (e.g., SUHAIL_11_12...)</label>
+          <input type="text" id="sessionIdInput" class="form-input" placeholder="Paste SUHAIL session ID here" style="margin-bottom: 12px; width: 100%; font-family: monospace; font-size: 12px;">
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button onclick="connectWhatsApp()" class="btn btn-primary">
+              <i class="fas fa-plug"></i> Connect with Session ID
+            </button>
+            <button onclick="disconnectWhatsApp()" class="btn btn-secondary">
+              <i class="fas fa-unlink"></i> Disconnect
+            </button>
+            <button onclick="checkStatus()" class="btn btn-secondary">
+              <i class="fas fa-sync"></i> Refresh
+            </button>
+          </div>
         </div>
 
         <div id="qrCodeSection" style="margin-top: 30px; display: none;">
@@ -222,7 +233,19 @@ This is a test message from Fresh Harvest Grocery.</textarea>
 
     async function connectWhatsApp() {
       try {
-        const response = await fetch('/api/whatsapp/connect', { method: 'POST' });
+        const sessionId = document.getElementById('sessionIdInput').value.trim();
+        if (!sessionId) {
+          showToast('Please enter a session ID first', 'error');
+          return;
+        }
+
+        showToast('Connecting with external session ID...', 'info');
+
+        const response = await fetch('/api/whatsapp/connect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ externalSessionId: sessionId })
+        });
         const data = await response.json();
         
         if (data.success) {
