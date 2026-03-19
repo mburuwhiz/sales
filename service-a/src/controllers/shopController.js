@@ -73,6 +73,24 @@ exports.checkout = async (req, res) => {
         console.error('Failed sending Admin WhatsApp alert', e);
       }
 
+      // Send User Order Approved Email via Service B
+      try {
+        const axios = require('axios');
+        await axios.post(process.env.MAILER_MICROSERVICE_URL, {
+          apiKey: process.env.MAILER_API_KEY,
+          action: 'order_approved',
+          recipientEmail: req.user.email,
+          recipientName: req.user.name,
+          variables: {
+            orderId: order._id,
+            amount: `KSH ${totalAmount}`,
+            trackingLink: `${process.env.CLIENT_URL}/track/${order._id}`
+          }
+        });
+      } catch (e) {
+        console.error('Failed sending order approval email via Service B', e.message);
+      }
+
       res.status(200).json({ message: 'Order placed successfully', orderId: order._id });
     } else {
       res.status(400).json({ message: 'STK Push failed. Please pay manually to 0113 323 234 (Peter Wekulo) and paste the confirmation message below.' });

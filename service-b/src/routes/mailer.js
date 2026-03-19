@@ -32,6 +32,9 @@ router.post('/send-email', verifyMicroservice, async (req, res) => {
     } else if (action === 'order_approved') {
       subject = 'Your Order Has Been Approved!';
       htmlContent = await ejs.renderFile(path.join(__dirname, '../views/emails/receipt.ejs'), variables);
+    } else if (action === 'abandoned_cart') {
+      subject = 'Did you forget something? - Fresh Harvest';
+      htmlContent = await ejs.renderFile(path.join(__dirname, '../views/emails/abandoned.ejs'), variables);
     } else if (action === 'custom_broadcast') {
       subject = variables.subject || 'Special Offer from Fresh Harvest';
       htmlContent = variables.rawHtml;

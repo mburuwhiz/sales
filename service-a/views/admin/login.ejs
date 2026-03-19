@@ -10,8 +10,8 @@
     <h2>Admin Login</h2>
     <form id="adminLoginForm">
       <div style="margin-bottom: 15px;">
-        <label>Email</label>
-        <input type="email" id="email" required style="width: 100%; padding: 8px;">
+        <label>Username</label>
+        <input type="text" id="username" required style="width: 100%; padding: 8px;">
       </div>
       <div style="margin-bottom: 15px;">
         <label>Password</label>
@@ -26,7 +26,7 @@
   <script>
     document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value;
+      const email = document.getElementById('username').value;
       const password = document.getElementById('password').value;
 
       try {

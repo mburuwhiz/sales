@@ -114,7 +114,7 @@ function addUpsellToCart() {
 }
 
 function proceedToCheckout() {
-  window.location.href = '/checkout'; // To be implemented in Route Architecture if not done
+  window.location.href = '/shop/checkout'; // The checkout route is mounted under /shop
 }
 
 function toggleCartDrawer() {
