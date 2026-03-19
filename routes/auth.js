@@ -48,10 +48,19 @@ router.post('/login', async (req, res) => {
       walletCoins: user.walletCoins
     };
 
-    const returnTo = req.session.returnTo || '/account';
-    delete req.session.returnTo;
-    
-    res.redirect(returnTo);
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.render('auth/login', {
+          title: 'Login - Fresh Harvest Grocery',
+          error: 'Session error. Please try again.'
+        });
+      }
+      const returnTo = req.session.returnTo || '/account';
+      delete req.session.returnTo;
+
+      res.redirect(returnTo);
+    });
   } catch (error) {
     console.error('Login error:', error);
     res.render('auth/login', {
@@ -141,7 +150,16 @@ router.post('/register', async (req, res) => {
       walletCoins: user.walletCoins
     };
 
-    res.redirect('/auth/verification-required');
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error on register:', err);
+        return res.render('auth/register', {
+          title: 'Register - Fresh Harvest Grocery',
+          error: 'Session error. Please try again.'
+        });
+      }
+      res.redirect('/auth/verification-required');
+    });
   } catch (error) {
     console.error('Registration error:', error);
     res.render('auth/register', {

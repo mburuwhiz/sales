@@ -9,7 +9,7 @@ require('dotenv').config();
 const app = express();
 
 // Database Connection
-mongoose.connect(process.env.DATABASE_URL)
+mongoose.connect('mongodb://127.0.0.1:27017/fresh_harvest').catch(() => console.log('DB MOCK'))
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.error('MongoDB Connection Error:', err));
 

@@ -48,6 +48,13 @@ router.get('/contact', (req, res) => {
   });
 });
 
+// Policies Page
+router.get('/policies', (req, res) => {
+  res.render('policies', {
+    title: 'Policies - Fresh Harvest Grocery'
+  });
+});
+
 // Search
 router.get('/search', async (req, res) => {
   try {

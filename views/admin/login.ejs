@@ -285,7 +285,8 @@
           <label class="form-label">Password</label>
           <div class="input-wrapper">
             <i class="fas fa-lock"></i>
-            <input type="password" name="password" class="form-input" placeholder="Enter password" required>
+            <input type="password" name="password" id="password" class="form-input" placeholder="Enter password" required>
+            <i class="fas fa-eye" id="togglePassword" style="left: auto; right: 16px; cursor: pointer; color: var(--sage-green);"></i>
           </div>
         </div>
 
@@ -303,10 +304,21 @@
   </div>
 
   <script>
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function (e) {
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+      this.classList.toggle('fa-eye-slash');
+    });
+
     document.getElementById('loginForm').addEventListener('submit', function(e) {
+      // Don't disable the button immediately, as it might prevent form submission in some browsers
       const btn = document.getElementById('submitBtn');
+      btn.style.opacity = '0.8';
+      btn.style.pointerEvents = 'none';
       btn.innerHTML = '<div class="spinner"></div> Signing in...';
-      btn.disabled = true;
     });
   </script>
 </body>

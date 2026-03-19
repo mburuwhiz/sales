@@ -23,28 +23,31 @@
               <!-- Dot -->
               <div style="
                 position: absolute;
-                left: -26px;
+                left: -19px;
                 top: 0;
-                width: 20px;
-                height: 20px;
+                width: 16px;
+                height: 16px;
                 border-radius: 50%;
-                background: <%= isCompleted ? 'var(--sage-green)' : 'var(--glass-border)' %>;
+                background: <%= isCompleted ? 'var(--sage-green)' : 'transparent' %>;
                 border: 3px solid <%= isCompleted ? 'var(--sage-green)' : 'var(--glass-border)' %>;
-                <%= isCurrent ? 'box-shadow: 0 0 0 4px rgba(122, 158, 126, 0.3);' : '' %>
+                <%= isCurrent ? 'box-shadow: 0 0 0 4px rgba(122, 158, 126, 0.3); z-index: 2;' : 'z-index: 2;' %>
               "></div>
               
               <div style="
                 padding: 15px;
                 border-radius: 12px;
-                background: <%= isCurrent ? 'rgba(122, 158, 126, 0.1)' : 'transparent' %>;
+                margin-left: 15px;
+                background: <%= isCurrent ? 'linear-gradient(135deg, rgba(122, 158, 126, 0.15), rgba(45, 90, 39, 0.1))' : 'transparent' %>;
+                border: <%= isCurrent ? '1px solid rgba(122, 158, 126, 0.3)' : '1px solid transparent' %>;
+                transition: all 0.3s ease;
               ">
-                <div style="font-weight: 600; margin-bottom: 5px;"><%= status %></div>
+                <div style="font-weight: 600; font-size: 16px; margin-bottom: 5px; color: <%= isCompleted ? 'var(--cream)' : 'rgba(245, 240, 232, 0.5)' %>;"><%= status %></div>
                 <% if (timelineEntry) { %>
                   <div style="font-size: 12px; color: rgba(245, 240, 232, 0.6);">
                     <i class="fas fa-clock"></i> <%= new Date(timelineEntry.time).toLocaleString() %>
                   </div>
                   <% if (timelineEntry.note) { %>
-                    <div style="font-size: 13px; color: rgba(245, 240, 232, 0.8); margin-top: 8px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                    <div style="font-size: 13px; color: rgba(245, 240, 232, 0.8); margin-top: 8px; padding: 10px; background: rgba(0,0,0,0.2); border-left: 3px solid var(--sage-green); border-radius: 4px;">
                       <%= timelineEntry.note %>
                     </div>
                   <% } %>
