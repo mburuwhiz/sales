@@ -9,15 +9,28 @@ dotenv.config();
 
 const app = express();
 
-// Sanitize data against NoSQL query injection
-app.use(mongoSanitize());
-
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Sanitize data against NoSQL query injection
+// Express 5+ compatibility fix for express-mongo-sanitize (overriding readonly req.query)
+app.use((req, res, next) => {
+  if (req.body) req.body = mongoSanitize.sanitize(req.body, { replaceWith: '_' });
+  if (req.params) req.params = mongoSanitize.sanitize(req.params, { replaceWith: '_' });
+  // Cannot directly overwrite req.query getter in some Express versions, so sanitize inner objects
+  if (req.query) {
+    for (const key in req.query) {
+      if (Object.hasOwnProperty.call(req.query, key)) {
+         req.query[key] = mongoSanitize.sanitize(req.query[key], { replaceWith: '_' });
+      }
+    }
+  }
+  next();
+});
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'secret',
