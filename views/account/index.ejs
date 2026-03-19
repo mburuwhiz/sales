@@ -1,90 +1,146 @@
-<div class="section">
-  <div class="container">
-    <div class="section-title">
-      <h2>Welcome, <%= user.name %></h2>
-      <p>Manage your account and orders</p>
+<!-- Account Header -->
+<div style="background: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.2)); padding: 80px 0 40px; margin-bottom: 40px; position: relative; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.05);">
+  <!-- Decorative Orbs -->
+  <div style="position: absolute; top: -50px; left: -50px; width: 200px; height: 200px; background: radial-gradient(circle, var(--sage-green) 0%, transparent 70%); opacity: 0.15; filter: blur(40px); z-index: 0;"></div>
+
+  <div class="container" style="position: relative; z-index: 1;">
+    <div style="display: flex; align-items: center; gap: 24px;">
+      <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--sage-green), var(--moss-green)); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: white; border: 4px solid rgba(255,255,255,0.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+        <%= user.name.charAt(0).toUpperCase() %>
+      </div>
+      <div>
+        <h1 style="font-family: 'Playfair Display', serif; font-size: 36px; margin-bottom: 8px; line-height: 1.2;">
+          Welcome back, <span style="color: var(--sage-green);"><%= user.name.split(' ')[0] %></span>
+        </h1>
+        <div style="display: flex; gap: 16px; font-size: 14px; color: rgba(245,240,232,0.7);">
+          <span style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-envelope"></i> <%= user.email %></span>
+          <span style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-phone"></i> <%= user.phone || 'No phone added' %></span>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
+
+<div class="section" style="padding-top: 0;">
+  <div class="container">
 
     <!-- Stats Cards -->
-    <div class="grid grid-4" style="margin-bottom: 40px;">
-      <div class="glass" style="padding: 25px; text-align: center;">
-        <i class="fas fa-shopping-bag" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
-        <div style="font-size: 24px; font-weight: 700;"><%= totalOrders %></div>
-        <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6);">Total Orders</div>
-      </div>
-      <div class="glass" style="padding: 25px; text-align: center;">
-        <i class="fas fa-clock" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
-        <div style="font-size: 24px; font-weight: 700;"><%= pendingOrders %></div>
-        <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6);">Pending Orders</div>
-      </div>
-      <div class="glass" style="padding: 25px; text-align: center;">
-        <i class="fas fa-coins" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
-        <div style="font-size: 24px; font-weight: 700;"><%= user.walletCoins %></div>
-        <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6);">Reward Coins</div>
-      </div>
-      <div class="glass" style="padding: 25px; text-align: center;">
-        <i class="fas fa-check-circle" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
-        <div style="font-size: 24px; font-weight: 700;">
-          <%= user.isEmailVerified && user.isPhoneVerified ? 'Verified' : 'Pending' %>
+    <div class="grid grid-4" style="margin-bottom: 50px; gap: 24px;">
+      <div class="glass" style="padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); position: relative; overflow: hidden;">
+        <div style="position: absolute; right: -20px; bottom: -20px; opacity: 0.05;"><i class="fas fa-shopping-bag" style="font-size: 120px;"></i></div>
+        <div style="width: 50px; height: 50px; background: rgba(122, 158, 126, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(122, 158, 126, 0.3);">
+           <i class="fas fa-shopping-bag" style="font-size: 20px; color: var(--sage-green);"></i>
         </div>
-        <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6);">Account Status</div>
+        <div style="font-size: 32px; font-weight: 700; font-family: 'Playfair Display', serif; margin-bottom: 4px;"><%= totalOrders %></div>
+        <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6); text-transform: uppercase; letter-spacing: 1px;">Total Orders</div>
+      </div>
+
+      <div class="glass" style="padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); position: relative; overflow: hidden;">
+        <div style="position: absolute; right: -20px; bottom: -20px; opacity: 0.05;"><i class="fas fa-clock" style="font-size: 120px;"></i></div>
+        <div style="width: 50px; height: 50px; background: rgba(180, 140, 50, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(180, 140, 50, 0.3);">
+           <i class="fas fa-clock" style="font-size: 20px; color: #e8c547;"></i>
+        </div>
+        <div style="font-size: 32px; font-weight: 700; font-family: 'Playfair Display', serif; margin-bottom: 4px;"><%= pendingOrders %></div>
+        <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6); text-transform: uppercase; letter-spacing: 1px;">Pending Orders</div>
+      </div>
+
+      <div class="glass" style="padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); position: relative; overflow: hidden;">
+        <div style="position: absolute; right: -20px; bottom: -20px; opacity: 0.05;"><i class="fas fa-coins" style="font-size: 120px;"></i></div>
+        <div style="width: 50px; height: 50px; background: rgba(122, 158, 126, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(122, 158, 126, 0.3);">
+           <i class="fas fa-coins" style="font-size: 20px; color: var(--sage-green);"></i>
+        </div>
+        <div style="font-size: 32px; font-weight: 700; font-family: 'Playfair Display', serif; margin-bottom: 4px;"><%= user.walletCoins %></div>
+        <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6); text-transform: uppercase; letter-spacing: 1px;">Reward Coins</div>
+      </div>
+
+      <div class="glass" style="padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); position: relative; overflow: hidden;">
+        <div style="position: absolute; right: -20px; bottom: -20px; opacity: 0.05;"><i class="fas fa-shield-alt" style="font-size: 120px;"></i></div>
+        <% const isVerified = user.isEmailVerified && user.isPhoneVerified; %>
+        <div style="width: 50px; height: 50px; background: <%= isVerified ? 'rgba(125, 216, 125, 0.15)' : 'rgba(139, 38, 53, 0.15)' %>; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid <%= isVerified ? 'rgba(125, 216, 125, 0.3)' : 'rgba(139, 38, 53, 0.3)' %>;">
+           <i class="fas <%= isVerified ? 'fa-check-circle' : 'fa-exclamation-triangle' %>" style="font-size: 20px; color: <%= isVerified ? '#7dd87d' : '#ff7a8a' %>;"></i>
+        </div>
+        <div style="font-size: 24px; font-weight: 700; font-family: 'Playfair Display', serif; margin-bottom: 4px; padding-top: 8px;">
+          <%= isVerified ? 'Verified' : 'Action Needed' %>
+        </div>
+        <div style="font-size: 13px; color: rgba(245, 240, 232, 0.6); text-transform: uppercase; letter-spacing: 1px;">Account Status</div>
       </div>
     </div>
 
     <!-- Quick Actions -->
-    <div class="grid grid-4" style="margin-bottom: 40px;">
-      <a href="/shop" class="glass" style="padding: 25px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
-        <i class="fas fa-shopping-basket" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
-        <h4>Shop Now</h4>
+    <h3 style="font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 20px; color: var(--sage-green);">Quick Links</h3>
+    <div class="grid grid-4" style="margin-bottom: 60px; gap: 20px;">
+      <a href="/shop" class="glass" style="padding: 20px; display: flex; align-items: center; gap: 16px; text-decoration: none; color: var(--cream); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(122, 158, 126, 0.4)'; this.style.transform='translateY(-3px)';" onmouseout="this.style.background=''; this.style.borderColor='rgba(255,255,255,0.05)'; this.style.transform='translateY(0)';">
+        <div style="width: 40px; height: 40px; background: rgba(122, 158, 126, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-shopping-basket" style="color: var(--sage-green);"></i>
+        </div>
+        <span style="font-weight: 500;">Shop Produce</span>
+        <i class="fas fa-chevron-right" style="margin-left: auto; color: rgba(255,255,255,0.2); font-size: 12px;"></i>
       </a>
-      <a href="/account/orders" class="glass" style="padding: 25px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
-        <i class="fas fa-list" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
-        <h4>My Orders</h4>
+
+      <a href="/account/orders" class="glass" style="padding: 20px; display: flex; align-items: center; gap: 16px; text-decoration: none; color: var(--cream); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(122, 158, 126, 0.4)'; this.style.transform='translateY(-3px)';" onmouseout="this.style.background=''; this.style.borderColor='rgba(255,255,255,0.05)'; this.style.transform='translateY(0)';">
+        <div style="width: 40px; height: 40px; background: rgba(122, 158, 126, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-list-alt" style="color: var(--sage-green);"></i>
+        </div>
+        <span style="font-weight: 500;">Order History</span>
+        <i class="fas fa-chevron-right" style="margin-left: auto; color: rgba(255,255,255,0.2); font-size: 12px;"></i>
       </a>
-      <a href="/account/profile" class="glass" style="padding: 25px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
-        <i class="fas fa-user" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
-        <h4>My Profile</h4>
+
+      <a href="/account/profile" class="glass" style="padding: 20px; display: flex; align-items: center; gap: 16px; text-decoration: none; color: var(--cream); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(122, 158, 126, 0.4)'; this.style.transform='translateY(-3px)';" onmouseout="this.style.background=''; this.style.borderColor='rgba(255,255,255,0.05)'; this.style.transform='translateY(0)';">
+        <div style="width: 40px; height: 40px; background: rgba(122, 158, 126, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-user-edit" style="color: var(--sage-green);"></i>
+        </div>
+        <span style="font-weight: 500;">Edit Profile</span>
+        <i class="fas fa-chevron-right" style="margin-left: auto; color: rgba(255,255,255,0.2); font-size: 12px;"></i>
       </a>
-      <a href="/account/help" class="glass" style="padding: 25px; text-align: center; text-decoration: none; color: var(--cream); transition: transform 0.3s ease;">
-        <i class="fas fa-question-circle" style="font-size: 30px; color: var(--sage-green); margin-bottom: 10px;"></i>
-        <h4>Need Help</h4>
+
+      <a href="/contact" class="glass" style="padding: 20px; display: flex; align-items: center; gap: 16px; text-decoration: none; color: var(--cream); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(122, 158, 126, 0.4)'; this.style.transform='translateY(-3px)';" onmouseout="this.style.background=''; this.style.borderColor='rgba(255,255,255,0.05)'; this.style.transform='translateY(0)';">
+        <div style="width: 40px; height: 40px; background: rgba(122, 158, 126, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-headset" style="color: var(--sage-green);"></i>
+        </div>
+        <span style="font-weight: 500;">Support</span>
+        <i class="fas fa-chevron-right" style="margin-left: auto; color: rgba(255,255,255,0.2); font-size: 12px;"></i>
       </a>
     </div>
 
-    <!-- Recent Orders -->
-    <div class="glass" style="padding: 30px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-        <h3><i class="fas fa-history" style="color: var(--sage-green); margin-right: 10px;"></i> Recent Orders</h3>
-        <a href="/account/orders" class="btn btn-secondary btn-sm">View All</a>
+    <!-- Recent Orders List -->
+    <div class="glass" style="padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">
+        <h3 style="font-family: 'Playfair Display', serif; font-size: 24px; margin: 0; display: flex; align-items: center; gap: 12px;">
+          <i class="fas fa-history" style="color: var(--sage-green); font-size: 20px;"></i> Recent Orders
+        </h3>
+        <a href="/account/orders" class="btn btn-secondary btn-sm" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">View All History</a>
       </div>
 
-      <% if (recentOrders.length > 0) { %>
+      <% if (recentOrders && recentOrders.length > 0) { %>
         <div style="overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse;">
+          <table style="width: 100%; border-collapse: separate; border-spacing: 0 12px;">
             <thead>
-              <tr style="border-bottom: 1px solid var(--glass-border);">
-                <th style="text-align: left; padding: 12px; font-weight: 600;">Order #</th>
-                <th style="text-align: left; padding: 12px; font-weight: 600;">Date</th>
-                <th style="text-align: left; padding: 12px; font-weight: 600;">Amount</th>
-                <th style="text-align: left; padding: 12px; font-weight: 600;">Status</th>
-                <th style="text-align: left; padding: 12px; font-weight: 600;">Action</th>
+              <tr>
+                <th style="text-align: left; padding: 0 16px 12px; font-weight: 600; color: rgba(245,240,232,0.6); font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Order ID</th>
+                <th style="text-align: left; padding: 0 16px 12px; font-weight: 600; color: rgba(245,240,232,0.6); font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Date Placed</th>
+                <th style="text-align: left; padding: 0 16px 12px; font-weight: 600; color: rgba(245,240,232,0.6); font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Total Amount</th>
+                <th style="text-align: left; padding: 0 16px 12px; font-weight: 600; color: rgba(245,240,232,0.6); font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Status</th>
+                <th style="text-align: right; padding: 0 16px 12px; font-weight: 600; color: rgba(245,240,232,0.6); font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Action</th>
               </tr>
             </thead>
             <tbody>
               <% recentOrders.forEach(order => { %>
-                <tr style="border-bottom: 1px solid rgba(122, 158, 126, 0.1);">
-                  <td style="padding: 12px;"><%= order.orderNumber %></td>
-                  <td style="padding: 12px;"><%= new Date(order.createdAt).toLocaleDateString() %></td>
-                  <td style="padding: 12px;">KSH <%= order.finalAmount.toLocaleString() %></td>
-                  <td style="padding: 12px;">
-                    <span class="badge badge-<%= 
-                      order.status === 'Delivered' ? 'success' : 
-                      order.status === 'Cancelled' ? 'danger' : 
-                      order.status === 'Pending Payment' ? 'warning' : 'info'
-                    %>"><%= order.status %></span>
+                <tr style="background: rgba(255,255,255,0.02); transition: background 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+                  <td style="padding: 16px; border-radius: 12px 0 0 12px; border: 1px solid rgba(255,255,255,0.02); border-right: none; font-family: monospace; font-size: 14px;"><%= order.orderNumber %></td>
+                  <td style="padding: 16px; border-top: 1px solid rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.02);"><%= new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></td>
+                  <td style="padding: 16px; border-top: 1px solid rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.02); font-weight: 600; color: var(--sage-green);">KSH <%= order.finalAmount.toLocaleString() %></td>
+                  <td style="padding: 16px; border-top: 1px solid rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.02);">
+                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+                      <%= order.status === 'Delivered' ? 'background: rgba(125, 216, 125, 0.15); color: #7dd87d; border: 1px solid rgba(125, 216, 125, 0.3);' :
+                          order.status === 'Cancelled' ? 'background: rgba(139, 38, 53, 0.15); color: #ff7a8a; border: 1px solid rgba(139, 38, 53, 0.3);' :
+                          order.status === 'Pending Payment' ? 'background: rgba(180, 140, 50, 0.15); color: #e8c547; border: 1px solid rgba(180, 140, 50, 0.3);' :
+                          'background: rgba(30, 77, 107, 0.15); color: #7dd3fc; border: 1px solid rgba(30, 77, 107, 0.3);' %>">
+                      <i class="fas <%= order.status === 'Delivered' ? 'fa-check-circle' : order.status === 'Cancelled' ? 'fa-times-circle' : order.status === 'Pending Payment' ? 'fa-clock' : 'fa-spinner' %>"></i>
+                      <%= order.status %>
+                    </span>
                   </td>
-                  <td style="padding: 12px;">
-                    <a href="/account/orders/<%= order._id %>" class="btn btn-primary btn-sm">View</a>
+                  <td style="padding: 16px; border-radius: 0 12px 12px 0; border: 1px solid rgba(255,255,255,0.02); border-left: none; text-align: right;">
+                    <a href="/account/orders/<%= order._id %>" class="btn btn-primary btn-sm" style="padding: 8px 16px; font-size: 13px;">Details <i class="fas fa-arrow-right" style="margin-left: 6px; font-size: 10px;"></i></a>
                   </td>
                 </tr>
               <% }) %>
@@ -92,10 +148,15 @@
           </table>
         </div>
       <% } else { %>
-        <div style="text-align: center; padding: 40px;">
-          <i class="fas fa-shopping-bag" style="font-size: 50px; color: var(--sage-green); opacity: 0.5; margin-bottom: 15px;"></i>
-          <p style="color: rgba(245, 240, 232, 0.7);">No orders yet. Start shopping!</p>
-          <a href="/shop" class="btn btn-primary" style="margin-top: 15px;">Browse Products</a>
+        <div style="text-align: center; padding: 60px 20px; border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; background: rgba(0,0,0,0.2);">
+          <div style="width: 80px; height: 80px; background: rgba(122, 158, 126, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+             <i class="fas fa-box-open" style="font-size: 32px; color: var(--sage-green); opacity: 0.8;"></i>
+          </div>
+          <h4 style="font-size: 20px; margin-bottom: 10px; font-family: 'Playfair Display', serif;">No orders yet</h4>
+          <p style="color: rgba(245, 240, 232, 0.6); max-width: 300px; margin: 0 auto 24px; font-size: 14px;">Your order history is empty. Start exploring our fresh produce to place your first order.</p>
+          <a href="/shop" class="btn btn-primary">
+            <i class="fas fa-shopping-basket" style="margin-right: 8px;"></i> Start Shopping
+          </a>
         </div>
       <% } %>
     </div>

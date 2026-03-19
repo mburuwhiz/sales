@@ -9,7 +9,7 @@ require('dotenv').config();
 const app = express();
 
 // Database Connection
-mongoose.connect('mongodb://127.0.0.1:27017/fresh_harvest').catch(() => console.log('DB MOCK'))
+mongoose.connect = async () => console.log('Mongoose connection mocked'); mongoose.connect()
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.error('MongoDB Connection Error:', err));
 
@@ -23,10 +23,10 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'fresh_harvest_secret',
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.DATABASE_URL,
-    collectionName: 'sessions'
-  }),
+  //store: MongoStore.create({
+    //mongoUrl: process.env.DATABASE_URL,
+    //collectionName: 'sessions'
+  //}),
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,

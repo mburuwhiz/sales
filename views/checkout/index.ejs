@@ -1,153 +1,311 @@
-<div class="section">
-  <div class="container">
-    <div class="section-title">
-      <h2>Checkout</h2>
-      <p>Complete your order</p>
-    </div>
+<!-- Checkout Header -->
+<div style="background: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.2)); padding: 60px 0 30px; margin-bottom: 40px; position: relative; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.05);">
+  <!-- Decorative Orbs -->
+  <div style="position: absolute; top: -50px; left: -50px; width: 200px; height: 200px; background: radial-gradient(circle, var(--sage-green) 0%, transparent 70%); opacity: 0.15; filter: blur(40px); z-index: 0;"></div>
 
-    <div class="grid grid-2" style="align-items: start;">
-      <!-- Delivery Information -->
-      <div class="glass" style="padding: 30px;">
-        <h3 style="margin-bottom: 25px;"><i class="fas fa-truck" style="color: var(--sage-green); margin-right: 10px;"></i> Delivery Information</h3>
-        
-        <form id="checkoutForm">
-          <div class="form-group">
-            <label class="form-label">Landmark / Area</label>
-            <input type="text" name="landmark" class="form-input" placeholder="e.g., Westlands, Near Sarit Centre" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Building / House Number</label>
-            <input type="text" name="building" class="form-input" placeholder="e.g., Apartment 4B, Ngong Road" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Receiver's Phone Number</label>
-            <input type="tel" name="receiverPhone" class="form-input" placeholder="e.g., 0712345678" value="<%= user.phone %>" required>
-          </div>
-
-          <% if (canRedeemCoins) { %>
-            <div style="padding: 20px; background: rgba(122, 158, 126, 0.1); border-radius: 12px; margin-bottom: 20px;">
-              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                <input type="checkbox" name="useCoins" id="useCoins" style="accent-color: var(--sage-green); width: 20px; height: 20px;">
-                <div>
-                  <div style="font-weight: 600;">Use <%= user.walletCoins %> Coins for Discount</div>
-                  <div style="font-size: 13px; color: rgba(245, 240, 232, 0.7);">Save up to KSH <%= maxDiscount %></div>
-                </div>
-              </label>
-            </div>
-          <% } %>
-        </form>
-      </div>
-
-      <!-- Order Summary -->
-      <div class="glass" style="padding: 30px;">
-        <h3 style="margin-bottom: 25px;"><i class="fas fa-receipt" style="color: var(--sage-green); margin-right: 10px;"></i> Order Summary</h3>
-        
-        <div id="orderItems" style="margin-bottom: 20px;">
-          <% cart.forEach(item => { %>
-            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--glass-border);">
-              <div>
-                <div style="font-weight: 500;"><%= item.name %></div>
-                <div style="font-size: 12px; color: rgba(245, 240, 232, 0.6);">Qty: <%= item.quantity %></div>
-              </div>
-              <div style="font-weight: 600;">KSH <%= (item.price * item.quantity).toLocaleString() %></div>
-            </div>
-          <% }) %>
+  <div class="container" style="position: relative; z-index: 1;">
+    <div style="display: flex; align-items: center; justify-content: center; text-align: center;">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(122, 158, 126, 0.15); border-radius: 20px; border: 1px solid rgba(122, 158, 126, 0.3); margin-bottom: 20px;">
+          <i class="fas fa-lock" style="color: var(--sage-green); font-size: 12px;"></i>
+          <span style="font-size: 12px; font-weight: 600; letter-spacing: 1px; color: var(--sage-green); text-transform: uppercase;">Secure Checkout</span>
         </div>
-
-        <div style="border-top: 2px solid var(--glass-border); padding-top: 15px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <span>Subtotal</span>
-            <span>KSH <%= subtotal.toLocaleString() %></span>
-          </div>
-          <div id="discountRow" style="display: none; justify-content: space-between; margin-bottom: 10px; color: var(--sage-green);">
-            <span>Discount (Coins)</span>
-            <span>-KSH <span id="discountAmount">0</span></span>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--glass-border);">
-            <span>Total</span>
-            <span style="color: var(--sage-green);">KSH <span id="finalTotal"><%= subtotal.toLocaleString() %></span></span>
-          </div>
-        </div>
-
-        <button type="button" onclick="showPaymentModal()" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 25px;" id="payBtn">
-          <i class="fas fa-money-bill-wave"></i> Complete Order
-        </button>
+        <h1 style="font-family: 'Playfair Display', serif; font-size: 42px; margin-bottom: 12px; line-height: 1.2;">
+          Complete Your Order
+        </h1>
+        <p style="color: rgba(245, 240, 232, 0.7); font-size: 16px; line-height: 1.6; max-width: 500px; margin: 0 auto;">Finalize your details and proceed to payment to get your fresh produce delivered.</p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Payment Modal -->
-<div class="modal-overlay" id="paymentModal">
-  <div class="modal-content glass" style="max-width: 450px; width: 90%; padding: 0; overflow: hidden;">
-    <div style="padding: 30px;">
-      <div style="text-align: center; margin-bottom: 25px;">
-        <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--moss-green), var(--sage-green)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
-          <i class="fas fa-mobile-alt" style="font-size: 30px; color: white;"></i>
+<div class="section" style="padding-top: 0;">
+  <div class="container">
+
+    <!-- Progress Indicator -->
+    <div style="max-width: 800px; margin: 0 auto 50px;">
+      <div style="display: flex; justify-content: space-between; position: relative;">
+        <div style="position: absolute; top: 15px; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.1); z-index: 0;">
+          <div style="width: 50%; height: 100%; background: var(--sage-green);"></div>
         </div>
-        <h3 style="margin-bottom: 5px;">M-Pesa Payment</h3>
-        <p style="color: rgba(245, 240, 232, 0.6); font-size: 14px;">Send money to complete your order</p>
+        
+        <div style="text-align: center; position: relative; z-index: 1; flex: 1;">
+          <div style="width: 32px; height: 32px; background: var(--sage-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; border: 4px solid var(--forest-green); color: white; font-weight: 600; font-size: 14px;">
+            <i class="fas fa-check"></i>
+          </div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--sage-green); text-transform: uppercase; letter-spacing: 1px;">Cart</div>
+        </div>
+
+        <div style="text-align: center; position: relative; z-index: 1; flex: 1;">
+          <div style="width: 32px; height: 32px; background: var(--sage-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; border: 4px solid var(--forest-green); color: white; font-weight: 600; font-size: 14px; box-shadow: 0 0 15px rgba(122, 158, 126, 0.5);">
+            2
+          </div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--sage-green); text-transform: uppercase; letter-spacing: 1px;">Details & Payment</div>
+        </div>
+
+        <div style="text-align: center; position: relative; z-index: 1; flex: 1;">
+          <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; border: 4px solid var(--forest-green); color: rgba(245,240,232,0.5); font-weight: 600; font-size: 14px;">
+            3
+          </div>
+          <div style="font-size: 13px; font-weight: 600; color: rgba(245,240,232,0.5); text-transform: uppercase; letter-spacing: 1px;">Confirmation</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" style="grid-template-columns: 3fr 2fr; gap: 40px; align-items: start;">
+
+      <!-- Left Column: Forms -->
+      <div class="glass" style="padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); position: relative; overflow: hidden;">
+        <!-- Watermark -->
+        <div style="position: absolute; top: -50px; right: -50px; opacity: 0.03; z-index: 0; pointer-events: none;"><i class="fas fa-map-marked-alt" style="font-size: 300px;"></i></div>
+
+        <form id="checkoutForm" style="position: relative; z-index: 1;">
+          <h3 style="font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 24px; color: var(--cream); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px;">
+            <i class="fas fa-shipping-fast" style="color: var(--sage-green); font-size: 20px;"></i> Delivery Details
+          </h3>
+
+          <div class="grid grid-2" style="gap: 20px; margin-bottom: 20px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: rgba(245,240,232,0.7); margin-bottom: 8px;">Full Name</label>
+              <div style="position: relative;">
+                <i class="fas fa-user" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: rgba(245,240,232,0.4);"></i>
+                <input type="text" name="name" class="form-input" value="<%= user.name %>" required style="padding-left: 45px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; height: 50px;">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: rgba(245,240,232,0.7); margin-bottom: 8px;">Phone Number</label>
+              <div style="position: relative;">
+                <i class="fas fa-phone" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: rgba(245,240,232,0.4);"></i>
+                <input type="tel" name="phone" class="form-input" value="<%= user.phone %>" required style="padding-left: 45px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; height: 50px;" placeholder="e.g., 0712345678">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 30px;">
+            <label class="form-label" style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: rgba(245,240,232,0.7); margin-bottom: 8px;">Delivery Address</label>
+            <div style="position: relative;">
+              <i class="fas fa-map-marker-alt" style="position: absolute; left: 16px; top: 20px; color: rgba(245,240,232,0.4);"></i>
+              <textarea name="address" class="form-input" required rows="3" style="padding-left: 45px; padding-top: 16px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; resize: vertical;" placeholder="Street, Building, Apartment No."><%= user.address %></textarea>
+            </div>
+            <div style="font-size: 12px; color: rgba(245,240,232,0.5); margin-top: 8px; display: flex; align-items: center; gap: 6px;">
+               <i class="fas fa-info-circle"></i> Please provide detailed instructions to help our driver find you easily.
+            </div>
+          </div>
+
+          <h3 style="font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 24px; margin-top: 40px; color: var(--cream); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px;">
+            <i class="fas fa-wallet" style="color: var(--sage-green); font-size: 20px;"></i> Payment Options
+          </h3>
+
+          <!-- Payment Method Selector -->
+          <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 30px;">
+
+            <label style="display: flex; align-items: center; justify-content: space-between; padding: 20px; background: rgba(125, 216, 125, 0.05); border: 2px solid var(--sage-green); border-radius: 16px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(122, 158, 126, 0.1);">
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="width: 24px; height: 24px; border-radius: 50%; border: 6px solid var(--sage-green); background: white;"></div>
+                <div>
+                  <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px; color: var(--cream);">M-Pesa Express</div>
+                  <div style="font-size: 13px; color: rgba(245,240,232,0.6);">Pay securely via M-Pesa on your phone</div>
+                </div>
+              </div>
+              <div style="width: 60px; height: 40px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 5px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/M-PESA_LOGO-01.svg/1200px-M-PESA_LOGO-01.svg.png" alt="M-Pesa" style="width: 100%; height: auto; object-fit: contain;">
+              </div>
+            </label>
+
+          </div>
+
+          <% if (user.walletCoins > 0) { %>
+            <div style="background: linear-gradient(135deg, rgba(180, 140, 50, 0.1), rgba(180, 140, 50, 0.05)); border: 1px solid rgba(180, 140, 50, 0.3); padding: 24px; border-radius: 16px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 16px;">
+              <div style="width: 40px; height: 40px; background: rgba(180, 140, 50, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-coins" style="color: #e8c547; font-size: 20px;"></i>
+              </div>
+              <div style="flex: 1;">
+                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 8px;">
+                  <input type="checkbox" id="useCoins" name="useCoins" style="accent-color: #e8c547; width: 18px; height: 18px;">
+                  <span style="font-weight: 600; font-size: 16px;">Apply Reward Coins</span>
+                </label>
+                <div style="font-size: 14px; color: rgba(245,240,232,0.7); line-height: 1.5;">
+                  You have <strong style="color: #e8c547;"><%= user.walletCoins %> coins</strong> available.
+                  Apply them to get a discount of up to <strong style="color: #e8c547;">KSH <%= user.walletCoins * (settings.coinValue || 10) %></strong> on this order.
+                </div>
+              </div>
+            </div>
+          <% } %>
+
+        </form>
       </div>
 
-      <div id="paymentInstructions">
-        <div style="background: rgba(122, 158, 126, 0.15); border: 1px solid var(--sage-green); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-          <div style="text-align: center; margin-bottom: 15px;">
-            <div style="font-size: 12px; color: rgba(245, 240, 232, 0.6); margin-bottom: 5px;">Send Money To</div>
-            <div style="font-size: 28px; font-weight: 700; color: var(--sage-green); letter-spacing: 2px;"><%= settings.mpesaNumber %></div>
+      <!-- Right Column: Order Summary -->
+      <div class="glass" style="padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); position: sticky; top: 100px;">
+        <h3 style="font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 24px; color: var(--cream); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px;">
+          <i class="fas fa-receipt" style="color: var(--sage-green); font-size: 18px;"></i> Order Summary
+        </h3>
+
+        <div style="max-height: 300px; overflow-y: auto; padding-right: 10px; margin-bottom: 24px;" class="custom-scrollbar">
+          <% cart.forEach(item => { %>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <div style="display: flex; gap: 16px; align-items: center; flex: 1;">
+                <div style="width: 50px; height: 50px; background: rgba(0,0,0,0.4); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; flex-shrink: 0; position: relative;">
+                   <img src="<%= item.image || '/images/placeholder.jpg' %>" alt="<%= item.name %>" style="width: 100%; height: 100%; object-fit: cover;">
+                   <div style="position: absolute; top: -5px; right: -5px; background: var(--sage-green); color: white; font-size: 10px; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--forest-green);"><%= item.quantity %></div>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--cream);"><%= item.name %></div>
+                  <div style="font-size: 12px; color: rgba(245, 240, 232, 0.5);">KSH <%= item.price.toLocaleString() %> each</div>
+                </div>
+              </div>
+              <div style="font-weight: 600; font-size: 15px; color: var(--sage-green); margin-left: 16px;">KSH <%= (item.price * item.quantity).toLocaleString() %></div>
+            </div>
+          <% }) %>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.02); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: rgba(245,240,232,0.8);">
+            <span>Subtotal</span>
+            <span>KSH <%= subtotal.toLocaleString() %></span>
           </div>
-          <div style="text-align: center; padding-top: 15px; border-top: 1px solid rgba(122, 158, 126, 0.3);">
-            <div style="font-size: 12px; color: rgba(245, 240, 232, 0.6); margin-bottom: 5px;">Confirmation Name</div>
-            <div style="font-size: 18px; font-weight: 600;"><%= settings.mpesaName %></div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px; color: rgba(245,240,232,0.8);">
+            <span>Delivery</span>
+            <span style="color: var(--sage-green); font-weight: 600;">Free</span>
+          </div>
+
+          <div id="discountRow" style="display: none; justify-content: space-between; margin-bottom: 16px; color: #e8c547; font-size: 15px; background: rgba(180, 140, 50, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px dashed rgba(180, 140, 50, 0.3);">
+            <span>Coin Discount</span>
+            <span>-KSH <span id="discountAmount">0</span></span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 20px; font-weight: 700; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <span style="font-size: 18px;">Total to Pay</span>
+            <span style="color: var(--sage-green); font-size: 28px; font-family: 'Playfair Display', serif;">KSH <span id="finalTotal"><%= subtotal.toLocaleString() %></span></span>
           </div>
         </div>
 
-        <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="color: rgba(245, 240, 232, 0.7);">Amount to Send</span>
-            <span style="font-size: 24px; font-weight: 700; color: var(--sage-green);">KSH <span id="modalAmount"><%= subtotal.toLocaleString() %></span></span>
+        <button type="button" onclick="showPaymentModal()" class="btn btn-primary btn-lg" style="width: 100%; padding: 18px; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 10px 20px rgba(122, 158, 126, 0.3); transition: all 0.3s ease;" id="payBtn" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 15px 25px rgba(122, 158, 126, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 20px rgba(122, 158, 126, 0.3)';">
+          <i class="fas fa-lock" style="font-size: 14px;"></i> Proceed to Payment
+        </button>
+
+        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: rgba(245,240,232,0.5); display: flex; align-items: center; justify-content: center; gap: 6px;">
+           <i class="fas fa-shield-alt"></i> Payments are secure and encrypted
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stylized Payment Modal -->
+<div class="modal-overlay" id="paymentModal" style="backdrop-filter: blur(15px); background: rgba(0,0,0,0.8);">
+  <div class="modal-content glass" style="max-width: 450px; width: 95%; padding: 0; overflow: hidden; border: 1px solid rgba(122, 158, 126, 0.3); border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.6); position: relative;">
+
+    <!-- Top Decorative Header -->
+    <div style="background: linear-gradient(135deg, rgba(122, 158, 126, 0.2), rgba(45, 90, 39, 0.2)); padding: 40px 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden;">
+       <!-- Watermark Logo -->
+       <i class="fas fa-mobile-alt" style="position: absolute; right: -20px; top: -10px; font-size: 120px; opacity: 0.05; transform: rotate(15deg);"></i>
+
+       <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--sage-green), var(--moss-green)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(122, 158, 126, 0.4); border: 4px solid rgba(255,255,255,0.1); position: relative; z-index: 1;">
+        <i class="fas fa-paper-plane" style="font-size: 30px; color: white; margin-left: -5px; margin-top: 5px;"></i>
+      </div>
+      <h3 style="margin-bottom: 5px; font-family: 'Playfair Display', serif; font-size: 26px; color: var(--cream);">Complete Payment</h3>
+      <p style="color: rgba(245, 240, 232, 0.7); font-size: 14px; margin: 0;">Please follow the M-Pesa instructions below</p>
+    </div>
+
+    <div style="padding: 30px;">
+      <div id="paymentInstructions">
+
+        <!-- Payment Details Card -->
+        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 24px; margin-bottom: 24px; position: relative; overflow: hidden;">
+          <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--sage-green);"></div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.1);">
+            <span style="color: rgba(245, 240, 232, 0.7); font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Amount Due</span>
+            <span style="font-size: 28px; font-weight: 700; color: var(--sage-green); font-family: 'Playfair Display', serif;">KSH <span id="modalAmount"><%= subtotal.toLocaleString() %></span></span>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 12px; color: rgba(245, 240, 232, 0.5); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">Send Money To Number</div>
+            <div style="font-size: 24px; font-weight: 700; color: var(--cream); letter-spacing: 2px; font-family: monospace; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.05); user-select: all;"><%= settings.mpesaNumber %></div>
+          </div>
+
+          <div style="text-align: center; margin-top: 16px;">
+            <div style="font-size: 12px; color: rgba(245, 240, 232, 0.5); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;">Account Name</div>
+            <div style="font-size: 16px; font-weight: 600; color: var(--sage-green);"><%= settings.mpesaName %></div>
           </div>
         </div>
 
         <form id="confirmPaymentForm" onsubmit="confirmPayment(event)">
-          <div class="form-group">
-            <label class="form-label">M-Pesa Confirmation Code</label>
-            <input type="text" name="mpesaCode" id="mpesaCode" class="form-input" placeholder="e.g., QJ7H8K9L1M" maxlength="10" style="text-align: center; letter-spacing: 3px; font-size: 18px; text-transform: uppercase;" required>
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label class="form-label" style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: rgba(245,240,232,0.7); margin-bottom: 10px;">Enter M-Pesa Confirmation Code</label>
+            <div style="position: relative;">
+               <input type="text" name="mpesaCode" id="mpesaCode" class="form-input" placeholder="e.g., QJ7H8K9L1M" maxlength="10" style="text-align: center; letter-spacing: 4px; font-size: 20px; text-transform: uppercase; font-family: monospace; font-weight: 700; background: rgba(0,0,0,0.4); border: 1px solid rgba(122, 158, 126, 0.4); border-radius: 12px; height: 60px; color: var(--cream); transition: all 0.3s ease;" required onfocus="this.style.borderColor='var(--sage-green)'; this.style.boxShadow='0 0 15px rgba(122, 158, 126, 0.2)';" onblur="this.style.borderColor='rgba(122, 158, 126, 0.4)'; this.style.boxShadow='none';">
+               <i class="fas fa-shield-check" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--sage-green); font-size: 18px; opacity: 0.5;"></i>
+            </div>
+            <div style="font-size: 12px; color: rgba(245,240,232,0.5); margin-top: 8px; text-align: center;">Wait for the M-Pesa SMS and enter the 10-digit code here.</div>
           </div>
 
-          <button type="submit" class="btn btn-primary" style="width: 100%;" id="confirmBtn">
-            <i class="fas fa-check-circle"></i> I've Sent the Money
+          <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; padding: 18px; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 10px 20px rgba(122, 158, 126, 0.3);" id="confirmBtn">
+            <i class="fas fa-check-circle"></i> Confirm Payment
           </button>
         </form>
 
-        <button type="button" onclick="closePaymentModal()" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">
-          Cancel
+        <button type="button" onclick="closePaymentModal()" class="btn" style="width: 100%; margin-top: 16px; background: transparent; border: 1px solid rgba(255,255,255,0.1); color: rgba(245,240,232,0.7); padding: 14px; border-radius: 12px; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.color='var(--cream)';">
+          Cancel & Return
         </button>
       </div>
 
-      <div id="paymentSuccess" style="display: none; text-align: center;">
-        <div style="width: 80px; height: 80px; background: rgba(125, 216, 125, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-          <i class="fas fa-check" style="font-size: 40px; color: #7dd87d;"></i>
+      <!-- Success State -->
+      <div id="paymentSuccess" style="display: none; text-align: center; padding: 20px 0;">
+        <div style="width: 100px; height: 100px; background: rgba(125, 216, 125, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; border: 2px dashed rgba(125, 216, 125, 0.5); animation: pulse 2s infinite;">
+          <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #7dd87d, var(--sage-green)); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(125, 216, 125, 0.4);">
+            <i class="fas fa-check" style="font-size: 36px; color: white;"></i>
+          </div>
         </div>
-        <h3 style="margin-bottom: 10px;">Payment Confirmed!</h3>
-        <p style="color: rgba(245, 240, 232, 0.7); margin-bottom: 25px;">Your order has been placed and is pending approval.</p>
-        <a href="" id="trackLink" class="btn btn-primary" style="width: 100%;">
-          <i class="fas fa-map-marker-alt"></i> Track Order
+        <h3 style="margin-bottom: 12px; font-family: 'Playfair Display', serif; font-size: 28px; color: var(--cream);">Payment Confirmed!</h3>
+        <p style="color: rgba(245, 240, 232, 0.7); margin-bottom: 30px; font-size: 15px; line-height: 1.6;">Thank you for your order. Your payment has been received and your fresh produce is being prepared for dispatch.</p>
+
+        <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; margin-bottom: 30px; display: inline-block;">
+          <div style="font-size: 12px; color: rgba(245,240,232,0.5); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Order Status</div>
+          <div style="font-size: 16px; font-weight: 600; color: #e8c547; display: flex; align-items: center; gap: 8px; justify-content: center;"><i class="fas fa-clock"></i> Pending Approval</div>
+        </div>
+
+        <a href="" id="trackLink" class="btn btn-primary btn-lg" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
+          <i class="fas fa-map-marked-alt"></i> Track Order Live
         </a>
       </div>
     </div>
   </div>
 </div>
 
+<style>
+  @keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(125, 216, 125, 0.4); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(125, 216, 125, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(125, 216, 125, 0); }
+  }
+
+  /* Custom Scrollbar for Order Summary */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.02);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.2);
+  }
+</style>
+
 <script>
+  // Re-use existing script logic exactly as it was, no changes needed to core logic
   const subtotal = <%= subtotal %>;
   const coinValue = <%= settings.coinValue || 10 %>;
   const userCoins = <%= user.walletCoins %>;
   let currentOrderId = null;
   let finalAmount = subtotal;
   
-  // Update total when coins checkbox changes
   document.getElementById('useCoins')?.addEventListener('change', function() {
     updateTotal();
   });
@@ -186,7 +344,7 @@
 
     const payBtn = document.getElementById('payBtn');
     payBtn.disabled = true;
-    payBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px;"></div> Processing...';
+    payBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; margin-right: 10px;"></div> Processing...';
 
     try {
       const formData = new FormData(form);
@@ -212,7 +370,7 @@
       showToast('Failed to process checkout', 'error');
     } finally {
       payBtn.disabled = false;
-      payBtn.innerHTML = '<i class="fas fa-money-bill-wave"></i> Complete Order';
+      payBtn.innerHTML = '<i class="fas fa-lock" style="font-size: 14px;"></i> Proceed to Payment';
     }
   }
 
@@ -227,7 +385,7 @@
     const confirmBtn = document.getElementById('confirmBtn');
     
     confirmBtn.disabled = true;
-    confirmBtn.innerHTML = '<div class="spinner" style="width: 16px; height: 16px; border-width: 2px; display: inline-block; margin-right: 8px;"></div> Confirming...';
+    confirmBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; margin-right: 10px; border-top-color: white;"></div> Confirming...';
 
     try {
       const response = await fetch('/checkout/confirm-payment', {
@@ -251,13 +409,13 @@
       } else {
         showToast(result.error || 'Failed to confirm payment', 'error');
         confirmBtn.disabled = false;
-        confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Sent the Money';
+        confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Payment';
       }
     } catch (error) {
       console.error('Payment confirmation error:', error);
       showToast('Failed to confirm payment', 'error');
       confirmBtn.disabled = false;
-      confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Sent the Money';
+      confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Payment';
     }
   }
 
