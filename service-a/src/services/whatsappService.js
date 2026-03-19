@@ -1,9 +1,11 @@
 const { makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 const axios = require('axios');
+const qrcode = require('qrcode-terminal');
 const AuthState = require('../models/AuthState');
 
 let sock = null;
+let isConnected = false;
 
 async function connectToWhatsApp() {
   const { useMongoDBAuthState } = require('./mongoAuthState');
@@ -11,7 +13,6 @@ async function connectToWhatsApp() {
 
   sock = makeWASocket({
     auth: auth.state,
-    printQRInTerminal: true,
     logger: pino({ level: 'silent' })
   });
 
@@ -20,10 +21,12 @@ async function connectToWhatsApp() {
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update;
     if (qr) {
-      console.log('QR Code generated');
+      console.log('QR Code generated. Please scan below:');
+      qrcode.generate(qr, { small: true });
     }
     if (connection === 'open') {
       console.log('opened connection');
+      isConnected = true;
       const adminPhone = process.env.ADMIN_PHONE || '+254712345678';
       const successMessage = `✅ *FRESH HARVEST SERVER CONNECTED*`;
       try {
@@ -33,12 +36,13 @@ async function connectToWhatsApp() {
       }
     }
     if (connection === 'close') {
+      isConnected = false;
       const shouldReconnect = (lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut;
       const is401 = (lastDisconnect.error)?.output?.statusCode === 401;
       console.log('connection closed due to ', lastDisconnect.error, ', reconnecting ', shouldReconnect);
 
       if (shouldReconnect && !is401) {
-        connectToWhatsApp();
+        setTimeout(connectToWhatsApp, 3000); // Wait 3s before reconnecting to prevent 405 loop
       } else {
          console.log('URGENT: WhatsApp Session Disconnected. Alerting Admin.');
          try {
@@ -55,14 +59,30 @@ async function connectToWhatsApp() {
            console.error('Failed to notify admin of disconnect via Service B', e.message);
          }
       }
-    } else if (connection === 'open') {
-      console.log('opened connection');
     }
   });
 }
 
 async function sendMessage(to, message) {
   if (!sock) await connectToWhatsApp();
+  if (!isConnected || !sock.user || !sock.user.id) {
+    console.warn('WhatsApp Socket is not fully connected or initialized yet. Retrying in 2 seconds...');
+    return new Promise((resolve, reject) => {
+      setTimeout(async () => {
+        if (isConnected && sock && sock.user && sock.user.id) {
+           const id = to.replace('+', '') + '@s.whatsapp.net';
+           try {
+             await sock.sendMessage(id, { text: message });
+             resolve();
+           } catch(e) {
+             reject(e);
+           }
+        } else {
+           reject(new Error('WhatsApp socket failed to initialize user ID in time.'));
+        }
+      }, 2000);
+    });
+  }
   const id = to.replace('+', '') + '@s.whatsapp.net';
   await sock.sendMessage(id, { text: message });
 }
